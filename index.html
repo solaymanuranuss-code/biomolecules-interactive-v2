@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الجزيئات الحيوية — السكريات، الدهنيات، البروتينات</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue-dark:#0a1628; --blue-mid:#0d2244; --blue-accent:#1a4a8a;
+      --blue-light:#2563eb; --blue-glow:#3b82f6; --teal:#0891b2;
+      --gold:#d97706; --green:#059669; --red:#dc2626; --purple:#7c3aed;
+      --white:#ffffff; --gray-100:#f1f5f9; --gray-200:#e2e8f0;
+      --gray-400:#94a3b8; --gray-600:#475569; --text-main:#1e293b;
+      --text-light:#64748b; --card-bg:#ffffff; --border:#e2e8f0;
+      --radius:12px; --shadow-sm:0 1px 3px rgba(0,0,0,.08);
+      --shadow-md:0 4px 12px rgba(0,0,0,.12);
+    }
+    body { font-family:'Segoe UI',Tahoma,Arial,sans-serif; background:var(--gray-100); color:var(--text-main); line-height:1.7; font-size:15px; }
+
+    /* HERO */
+    .hero { background:linear-gradient(135deg,var(--blue-dark) 0%,var(--blue-mid) 50%,#0f3460 100%); color:var(--white); padding:60px 24px 48px; text-align:center; position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 30% 50%,rgba(37,99,235,.25) 0%,transparent 70%),radial-gradient(ellipse at 70% 20%,rgba(8,145,178,.2) 0%,transparent 60%); }
+    .hero-badge { display:inline-block; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); border-radius:50px; padding:6px 18px; font-size:.8rem; letter-spacing:.08em; margin-bottom:24px; position:relative; }
+    .hero h1 { font-size:clamp(1.8rem,5vw,3rem); font-weight:800; line-height:1.25; margin-bottom:16px; position:relative; }
+    .hero p { font-size:clamp(.9rem,2vw,1.1rem); opacity:.85; max-width:680px; margin:0 auto 36px; position:relative; }
+    .hero-stats { display:flex; justify-content:center; gap:40px; flex-wrap:wrap; position:relative; }
+    .hero-stat { text-align:center; }
+    .hero-stat .num { font-size:2rem; font-weight:800; color:#60a5fa; display:block; }
+    .hero-stat .lbl { font-size:.78rem; opacity:.75; }
+
+    /* NAV */
+    .nav-wrap { position:sticky; top:0; z-index:100; background:var(--white); border-bottom:2px solid var(--border); box-shadow:var(--shadow-sm); }
+    .nav-tabs { display:flex; justify-content:center; gap:4px; padding:8px 16px; overflow-x:auto; scrollbar-width:none; }
+    .nav-tabs::-webkit-scrollbar { display:none; }
+    .nav-tab { padding:10px 20px; border:none; background:transparent; border-radius:8px; font-size:.9rem; font-weight:600; cursor:pointer; color:var(--text-light); white-space:nowrap; transition:all .2s; font-family:inherit; }
+    .nav-tab:hover { background:var(--gray-100); color:var(--text-main); }
+    .nav-tab.active { background:var(--blue-light); color:var(--white); }
+
+    /* MAIN */
+    .main { max-width:900px; margin:0 auto; padding:32px 16px 60px; }
+    .section { display:none; }
+    .section.active { display:block; }
+
+    /* SECTION HEADER */
+    .sec-header { text-align:center; margin-bottom:32px; }
+    .sec-header h2 { font-size:clamp(1.5rem,4vw,2rem); font-weight:800; color:var(--text-main); margin-bottom:8px; }
+    .sec-header .sub { font-size:.9rem; color:var(--text-light); }
+    .sec-icon { font-size:2.5rem; margin-bottom:12px; display:block; }
+
+    /* GRID */
+    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+    .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+    @media(max-width:768px) { .grid-2,.grid-3 { grid-template-columns:1fr; } }
+
+    /* CARD */
+    .card { background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius); padding:24px; box-shadow:var(--shadow-sm); transition:box-shadow .2s,transform .2s; margin-bottom:24px; }
+    .card:hover { box-shadow:var(--shadow-md); transform:translateY(-2px); }
+    .card-title { font-size:1rem; font-weight:700; color:var(--text-main); margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+    .card-title .dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+
+    /* DEF BOX */
+    .def-box { background:linear-gradient(135deg,#eff6ff,#dbeafe); border:1px solid #bfdbfe; border-right:4px solid var(--blue-light); border-radius:var(--radius); padding:20px 24px; margin-bottom:28px; }
+    .def-box.green { background:linear-gradient(135deg,#f0fdf4,#dcfce7); border-color:#bbf7d0; border-right-color:var(--green); }
+    .def-box.purple { background:linear-gradient(135deg,#faf5ff,#ede9fe); border-color:#ddd6fe; border-right-color:var(--purple); }
+    .def-box.gold { background:linear-gradient(135deg,#fffbeb,#fef3c7); border-color:#fde68a; border-right-color:var(--gold); }
+    .def-box .def-label { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--blue-light); margin-bottom:8px; }
+    .def-box.green .def-label { color:var(--green); }
+    .def-box.purple .def-label { color:var(--purple); }
+    .def-box.gold .def-label { color:var(--gold); }
+    .def-box p { font-size:.95rem; color:var(--text-main); line-height:1.75; }
+
+    /* FORMULA */
+    .formula { display:inline-flex; align-items:center; gap:6px; background:var(--blue-dark); color:var(--white); border-radius:8px; padding:6px 14px; font-family:'Courier New',monospace; font-size:.9rem; font-weight:700; letter-spacing:.05em; }
+    .formula.green { background:#065f46; }
+    .formula.purple { background:#4c1d95; }
+    .formula.gold { background:#92400e; }
+
+    /* TABLE */
+    .class-table { width:100%; border-collapse:collapse; font-size:.88rem; margin-top:12px; }
+    .class-table th { background:var(--blue-dark); color:var(--white); padding:10px 14px; text-align:right; font-weight:600; }
+    .class-table td { padding:10px 14px; border-bottom:1px solid var(--border); vertical-align:top; }
+    .class-table tr:nth-child(even) td { background:var(--gray-100); }
+    .class-table tr:hover td { background:#eff6ff; }
+
+    /* COMPARE TABLE */
+    .compare-table { width:100%; border-collapse:collapse; font-size:.88rem; }
+    .compare-table th { padding:12px 16px; text-align:center; font-weight:700; }
+    .compare-table th:first-child { text-align:right; }
+    .compare-table td { padding:12px 16px; border-bottom:1px solid var(--border); text-align:center; }
+    .compare-table td:first-child { text-align:right; font-weight:600; }
+    .compare-table tr:nth-child(even) td { background:var(--gray-100); }
+    .compare-table thead tr th { background:var(--blue-dark); color:var(--white); }
+
+    /* CHART */
+    .chart-wrap { background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius); padding:24px; box-shadow:var(--shadow-sm); margin-bottom:28px; }
+    .chart-wrap h3 { font-size:1rem; font-weight:700; margin-bottom:16px; color:var(--text-main); }
+    .chart-container { position:relative; height:280px; }
+
+    /* TAG */
+    .tag { display:inline-block; padding:3px 10px; border-radius:50px; font-size:.75rem; font-weight:600; margin:2px; }
+    .tag-blue { background:#dbeafe; color:#1d4ed8; }
+    .tag-green { background:#dcfce7; color:#166534; }
+    .tag-purple { background:#ede9fe; color:#6d28d9; }
+    .tag-gold { background:#fef3c7; color:#92400e; }
+    .tag-red { background:#fee2e2; color:#991b1b; }
+    .tag-teal { background:#ccfbf1; color:#0f766e; }
+
+    /* OVERVIEW CARDS */
+    .overview-card { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow-sm); transition:all .2s; cursor:pointer; }
+    .overview-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-md); }
+    .overview-card .ov-icon { font-size:2rem; margin-bottom:10px; }
+    .overview-card h3 { font-size:1rem; font-weight:700; margin-bottom:6px; }
+    .overview-card p { font-size:.85rem; color:var(--text-light); }
+    .overview-card .ov-formula { font-size:.8rem; font-family:monospace; margin-top:8px; padding:4px 10px; border-radius:6px; display:inline-block; }
+
+    /* IMPORTANCE STEPS */
+    .imp-list { display:flex; flex-direction:column; gap:16px; }
+    .imp-item { display:flex; gap:16px; align-items:flex-start; }
+    .imp-num { width:36px; height:36px; border-radius:50%; background:var(--blue-light); color:var(--white); font-weight:800; font-size:.9rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .imp-content h4 { font-size:.95rem; font-weight:700; margin-bottom:4px; }
+    .imp-content p { font-size:.88rem; color:var(--text-light); }
+
+    /* BOND DIAGRAM */
+    .bond-diagram { background:var(--blue-dark); border-radius:var(--radius); padding:24px; color:var(--white); text-align:center; font-family:monospace; font-size:.95rem; line-height:2; }
+    .bond-diagram .arrow { color:#60a5fa; font-size:1.2rem; }
+    .bond-diagram .highlight { color:#fbbf24; font-weight:700; }
+    .bond-diagram .note { font-size:.8rem; color:#94a3b8; margin-top:8px; font-family:sans-serif; }
+
+    /* STRUCT LEVELS */
+    .struct-levels { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+    @media(max-width:600px) { .struct-levels { grid-template-columns:1fr; } }
+    .struct-level { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:20px; position:relative; overflow:hidden; }
+    .struct-level::before { content:''; position:absolute; top:0; right:0; width:4px; height:100%; }
+    .struct-level:nth-child(1)::before { background:#818cf8; }
+    .struct-level:nth-child(2)::before { background:#a78bfa; }
+    .struct-level:nth-child(3)::before { background:#c084fc; }
+    .struct-level:nth-child(4)::before { background:#e879f9; }
+    .lvl-num { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.9rem; margin-bottom:10px; }
+    .struct-level h4 { font-size:.95rem; font-weight:700; margin-bottom:6px; }
+    .struct-level p { font-size:.85rem; color:var(--text-light); }
+
+    /* FUNC CARDS */
+    .func-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+    @media(max-width:600px) { .func-grid { grid-template-columns:1fr 1fr; } }
+    .func-card { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:16px; text-align:center; box-shadow:var(--shadow-sm); }
+    .func-card .fc-icon { font-size:1.8rem; margin-bottom:8px; }
+    .func-card h4 { font-size:.88rem; font-weight:700; margin-bottom:4px; }
+    .func-card p { font-size:.78rem; color:var(--text-light); }
+
+    /* FAQ ACCORDION */
+    .faq-list { display:flex; flex-direction:column; gap:8px; }
+    .faq-item { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+    .faq-q { width:100%; background:none; border:none; padding:16px 20px; text-align:right; font-size:.95rem; font-weight:600; cursor:pointer; display:flex; justify-content:space-between; align-items:center; color:var(--text-main); font-family:inherit; transition:background .2s; }
+    .faq-q:hover { background:var(--gray-100); }
+    .faq-q .faq-arrow { transition:transform .3s; font-size:.8rem; color:var(--text-light); }
+    .faq-item.open .faq-q .faq-arrow { transform:rotate(180deg); }
+    .faq-a { max-height:0; overflow:hidden; transition:max-height .35s ease; }
+    .faq-item.open .faq-a { max-height:300px; }
+    .faq-a-inner { padding:0 20px 16px; font-size:.9rem; color:var(--text-light); line-height:1.7; border-top:1px solid var(--border); padding-top:12px; }
+
+    /* QUIZ */
+    .quiz-wrap { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:28px; box-shadow:var(--shadow-sm); }
+    .quiz-progress { height:6px; background:var(--gray-200); border-radius:3px; margin-bottom:24px; overflow:hidden; }
+    .quiz-progress-bar { height:100%; background:var(--blue-light); border-radius:3px; transition:width .4s; }
+    .quiz-q-num { font-size:.8rem; color:var(--text-light); margin-bottom:8px; }
+    .quiz-question { font-size:1.05rem; font-weight:700; margin-bottom:20px; line-height:1.5; }
+    .quiz-options { display:flex; flex-direction:column; gap:10px; }
+    .quiz-opt { background:var(--gray-100); border:2px solid var(--border); border-radius:10px; padding:12px 18px; cursor:pointer; font-size:.92rem; text-align:right; transition:all .2s; font-family:inherit; width:100%; }
+    .quiz-opt:hover:not(:disabled) { border-color:var(--blue-light); background:#eff6ff; }
+    .quiz-opt.correct { background:#dcfce7; border-color:#16a34a; color:#166534; }
+    .quiz-opt.wrong { background:#fee2e2; border-color:#dc2626; color:#991b1b; }
+    .quiz-opt:disabled { cursor:not-allowed; }
+    .quiz-feedback { margin-top:16px; padding:12px 16px; border-radius:8px; font-size:.9rem; display:none; }
+    .quiz-feedback.show { display:block; }
+    .quiz-feedback.correct { background:#dcfce7; color:#166534; }
+    .quiz-feedback.wrong { background:#fee2e2; color:#991b1b; }
+    .quiz-nav { display:flex; justify-content:space-between; align-items:center; margin-top:20px; }
+    .quiz-btn { background:var(--blue-light); color:var(--white); border:none; border-radius:8px; padding:10px 24px; font-size:.9rem; font-weight:600; cursor:pointer; font-family:inherit; transition:background .2s; }
+    .quiz-btn:hover { background:#1d4ed8; }
+    .quiz-btn:disabled { background:var(--gray-400); cursor:not-allowed; }
+    .quiz-score { text-align:center; padding:32px; }
+    .quiz-score .score-num { font-size:3rem; font-weight:800; color:var(--blue-light); }
+    .quiz-score p { color:var(--text-light); margin-top:8px; }
+    .quiz-score .restart-btn { margin-top:20px; background:var(--blue-light); color:var(--white); border:none; border-radius:8px; padding:12px 28px; font-size:1rem; font-weight:600; cursor:pointer; font-family:inherit; }
+
+    /* PHOSPHOLIPID */
+    .phospho-diagram { background:var(--blue-dark); border-radius:var(--radius); padding:24px; color:var(--white); text-align:center; }
+    .phospho-head { background:#3b82f6; border-radius:50px; padding:8px 20px; display:inline-block; margin-bottom:8px; font-size:.85rem; }
+    .phospho-tail { color:#94a3b8; font-size:.85rem; margin:4px 0; }
+    .phospho-sep { border-top:2px dashed #475569; margin:12px 0; font-size:.75rem; color:#64748b; }
+
+    /* SUMMARY BOX */
+    .summary-box { background:linear-gradient(135deg,var(--blue-dark),#0f3460); color:var(--white); border-radius:var(--radius); padding:32px; text-align:center; margin-top:32px; }
+    .summary-box h3 { font-size:1.3rem; font-weight:800; margin-bottom:12px; }
+    .summary-box p { opacity:.85; font-size:.95rem; line-height:1.75; max-width:600px; margin:0 auto 24px; }
+    .summary-stats { display:flex; justify-content:center; gap:32px; flex-wrap:wrap; }
+    .s-stat .s-num { font-size:2rem; font-weight:800; color:#60a5fa; }
+    .s-stat .s-lbl { font-size:.78rem; opacity:.75; }
+
+    /* FOOTER */
+    footer { background:var(--blue-dark); color:rgba(255,255,255,.7); text-align:center; padding:24px 16px; font-size:.85rem; }
+    footer strong { color:var(--white); }
+
+    /* NUCLEIC ACIDS */
+    .na-card { background:linear-gradient(135deg,#faf5ff,#ede9fe); border:1px solid #ddd6fe; border-radius:var(--radius); padding:20px; }
+    .na-compare { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
+    @media(max-width:600px) { .na-compare { grid-template-columns:1fr; } }
+    .na-type { background:var(--white); border-radius:10px; padding:16px; border:1px solid #ddd6fe; }
+    .na-type h4 { font-size:.95rem; font-weight:700; margin-bottom:8px; }
+    .na-type p { font-size:.85rem; color:var(--text-light); }
+
+    /* ENZYME */
+    .enzyme-diagram { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:20px; text-align:center; }
+    .enzyme-step { display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap; margin:12px 0; font-size:.9rem; }
+    .enzyme-box { background:var(--blue-dark); color:var(--white); border-radius:8px; padding:8px 16px; font-weight:600; }
+    .enzyme-box.substrate { background:#059669; }
+    .enzyme-box.product { background:#d97706; }
+    .enzyme-box.complex { background:#7c3aed; }
+    .enzyme-arrow { font-size:1.2rem; color:var(--text-light); }
+
+    /* AMINO ACID VISUAL */
+    .aa-visual { background:var(--blue-dark); border-radius:var(--radius); padding:20px; color:var(--white); text-align:center; font-family:monospace; }
+    .aa-group { display:inline-block; padding:6px 14px; border-radius:8px; margin:4px; font-size:.85rem; font-weight:700; }
+    .aa-group.carboxyl { background:#dc2626; }
+    .aa-group.amino { background:#2563eb; }
+    .aa-group.alpha { background:#7c3aed; }
+    .aa-group.r { background:#d97706; }
+
+    /* LIPID TYPES */
+    .lipid-types { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+    @media(max-width:600px) { .lipid-types { grid-template-columns:1fr; } }
+    .lipid-type { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:16px; }
+    .lipid-type .lt-icon { font-size:1.5rem; margin-bottom:8px; }
+    .lipid-type h4 { font-size:.92rem; font-weight:700; margin-bottom:6px; }
+    .lipid-type p { font-size:.82rem; color:var(--text-light); }
+
+    /* PROTEIN TYPES */
+    .prot-types { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:24px; }
+    @media(max-width:600px) { .prot-types { grid-template-columns:1fr; } }
+    .prot-type { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:16px; border-right:4px solid var(--purple); }
+    .prot-type h4 { font-size:.92rem; font-weight:700; margin-bottom:6px; color:var(--purple); }
+    .prot-type p { font-size:.82rem; color:var(--text-light); }
+    .prot-type .examples { margin-top:8px; }
+
+    /* SECTION DIVIDER */
+    .sec-divider { height:1px; background:var(--border); margin:32px 0; }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">🔬 الكيمياء الحيوية — المستوى الأول باك علوم تجريبية</div>
+  <h1>الجزيئات الحيوية الكبرى<br>في الكائنات الحية</h1>
+  <p>دراسة أكاديمية شاملة للسكريات والدهنيات والبروتينات والأحماض النووية — تعريفها، أصنافها، تركيبتها الكيميائية، ووظائفها الحيوية</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><span class="num">4</span><span class="lbl">جزيئات حيوية كبرى</span></div>
+    <div class="hero-stat"><span class="num">20</span><span class="lbl">حمضاً أمينياً للبروتينات</span></div>
+    <div class="hero-stat"><span class="num">C·H·O</span><span class="lbl">عناصر السكريات والدهنيات</span></div>
+    <div class="hero-stat"><span class="num">4</span><span class="lbl">مستويات بنية البروتين</span></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav-wrap">
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showSection('overview',this)">🏠 نظرة عامة</button>
+    <button class="nav-tab" onclick="showSection('sugars',this)">🍬 السكريات</button>
+    <button class="nav-tab" onclick="showSection('lipids',this)">🫧 الدهنيات</button>
+    <button class="nav-tab" onclick="showSection('proteins',this)">🧬 البروتينات</button>
+    <button class="nav-tab" onclick="showSection('nucleic',this)">🔵 الأحماض النووية</button>
+    <button class="nav-tab" onclick="showSection('compare',this)">📊 مقارنة شاملة</button>
+    <button class="nav-tab" onclick="showSection('quiz',this)">🧪 اختبار تفاعلي</button>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ===== OVERVIEW ===== -->
+<div id="overview" class="section active">
+  <div class="sec-header">
+    <span class="sec-icon">🔬</span>
+    <h2>نظرة عامة على الجزيئات الحيوية</h2>
+    <p class="sub">المادة العضوية وأهمية الجزيئات الحيوية الكبرى في الكائنات الحية</p>
+  </div>
+
+  <div class="def-box">
+    <div class="def-label">تعريف عام</div>
+    <p><strong>الجزيئات الحيوية الكبرى</strong> هي مركبات عضوية ضخمة تُشكّل البنية الأساسية للكائنات الحية وتُؤدّي وظائف حيوية جوهرية. تنقسم إلى أربع مجموعات رئيسية: <strong>السكريات (الكربوهيدرات)</strong>، <strong>الدهنيات (الليبيدات)</strong>، <strong>البروتينات</strong>، و<strong>الأحماض النووية</strong>. تتكون جميعها في الأساس من عناصر الكربون (C)، الهيدروجين (H)، والأكسجين (O)، فيما تحتوي البروتينات إضافةً على النيتروجين (N) والكبريت (S)، والأحماض النووية على النيتروجين (N) والفوسفور (P).</p>
+  </div>
+
+  <div class="grid-3" style="margin-bottom:28px;">
+    <div class="overview-card" onclick="showSection('sugars',document.querySelectorAll('.nav-tab')[1])">
+      <div class="ov-icon">🍬</div>
+      <h3>السكريات</h3>
+      <p>مصدر الطاقة الأساسي للخلايا الحية. تتكون من ذرات الكربون والهيدروجين والأكسجين بنسبة محددة.</p>
+      <div class="ov-formula tag tag-gold">Cₙ(H₂O)ₙ</div>
+    </div>
+    <div class="overview-card" onclick="showSection('lipids',document.querySelectorAll('.nav-tab')[2])">
+      <div class="ov-icon">🫧</div>
+      <h3>الدهنيات</h3>
+      <p>مركبات كارهة للماء تُخزّن الطاقة وتُشكّل أغشية الخلايا وتُنتج الهرمونات.</p>
+      <div class="ov-formula tag tag-green">C·H·O (نسبة O منخفضة)</div>
+    </div>
+    <div class="overview-card" onclick="showSection('proteins',document.querySelectorAll('.nav-tab')[3])">
+      <div class="ov-icon">🧬</div>
+      <h3>البروتينات</h3>
+      <p>بوليمرات من الأحماض الأمينية تُؤدّي وظائف إنزيمية وبنائية وتنظيمية ومناعية.</p>
+      <div class="ov-formula tag tag-purple">C·H·O·N·S</div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:28px;">
+    <div class="chart-wrap">
+      <h3>📊 مقارنة الطاقة المُنتَجة (كيلو جول / غرام)</h3>
+      <div class="chart-container"><canvas id="energyChart"></canvas></div>
+    </div>
+    <div class="chart-wrap">
+      <h3>🧪 العناصر الكيميائية في كل جزيء حيوي</h3>
+      <div class="chart-container"><canvas id="elementsChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--blue-light)"></span>أهمية الجزيئات الحيوية</div>
+    <div class="imp-list">
+      <div class="imp-item"><div class="imp-num">1</div><div class="imp-content"><h4>إمداد الطاقة</h4><p>السكريات والدهنيات هي المصادر الرئيسية للطاقة الخلوية عبر التنفس الخلوي.</p></div></div>
+      <div class="imp-item"><div class="imp-num">2</div><div class="imp-content"><h4>البناء الهيكلي</h4><p>البروتينات والدهنيات تُشكّل الأغشية الخلوية والأنسجة والأعضاء.</p></div></div>
+      <div class="imp-item"><div class="imp-num">3</div><div class="imp-content"><h4>التنظيم الحيوي</h4><p>الإنزيمات والهرمونات والأجسام المضادة — كلها بروتينات تنظّم العمليات الحيوية.</p></div></div>
+      <div class="imp-item"><div class="imp-num">4</div><div class="imp-content"><h4>حفظ المعلومات الوراثية</h4><p>الأحماض النووية (DNA و RNA) تحمل وتنقل المعلومات الجينية عبر الأجيال.</p></div></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== SUGARS ===== -->
+<div id="sugars" class="section">
+  <div class="sec-header">
+    <span class="sec-icon">🍬</span>
+    <h2>السكريات (الكربوهيدرات)</h2>
+    <p class="sub">Carbohydrates — Glucides — السكريات</p>
+  </div>
+
+  <div class="def-box gold">
+    <div class="def-label">التعريف العلمي</div>
+    <p><strong>السكريات</strong> (أو الكربوهيدرات أو الغلوسيدات) هي <strong>مركبات عضوية</strong> تُعرَّف بأنها «الدهيدات عديدة الهيدروكسيل أو كيتونات عديدة الهيدروكسيل ومشتقاتها». تتكون من عناصر الكربون (C) والهيدروجين (H) والأكسجين (O) وفق الصيغة العامة:</p>
+    <div style="margin-top:12px;text-align:center;">
+      <span class="formula gold">Cₙ(H₂O)ₙ</span>
+      <span style="margin:0 12px;color:var(--text-light)">أو بصورة أدق:</span>
+      <span class="formula gold">Cₓ Hᵧ Oᵤ</span>
+      <span style="font-size:.85rem;color:var(--text-light);margin-right:8px">حيث z = y = 2x</span>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--gold)"></span>التركيبة الكيميائية</div>
+      <p style="font-size:.9rem;margin-bottom:12px;">تتميّز السكريات بوجود مجموعتين وظيفيتين متعددتين:</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+        <div style="background:#fef3c7;border-radius:8px;padding:10px 16px;flex:1;min-width:120px;">
+          <div style="font-weight:700;color:#92400e;margin-bottom:4px;">مجموعة الألدهيد</div>
+          <div style="font-family:monospace;font-size:1.1rem;">CHO —</div>
+        </div>
+        <div style="background:#fef3c7;border-radius:8px;padding:10px 16px;flex:1;min-width:120px;">
+          <div style="font-weight:700;color:#92400e;margin-bottom:4px;">مجموعة الهيدروكسيل</div>
+          <div style="font-family:monospace;font-size:1.1rem;">OH —</div>
+        </div>
+      </div>
+      <p style="font-size:.85rem;color:var(--text-light);">مثال: الغلوكوز C₆H₁₂O₆ — سكر سداسي الكربون (هكسوز)، يحتوي على مجموعة الألدهيد (الدور).</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--gold)"></span>الخصائص الفيزيائية والكيميائية</div>
+      <table style="width:100%;font-size:.88rem;border-collapse:collapse;">
+        <tr><td style="padding:8px;border-bottom:1px solid var(--border);font-weight:600;">الذوبانية</td><td style="padding:8px;border-bottom:1px solid var(--border);">تذوب أحاديات وقليلات السكاريد جيداً في الماء</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid var(--border);font-weight:600;">الطعم</td><td style="padding:8px;border-bottom:1px solid var(--border);">السكريات البسيطة حلوة المذاق</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid var(--border);font-weight:600;">الضوئي</td><td style="padding:8px;border-bottom:1px solid var(--border);">تُدوّر معظم السكريات مستوى الضوء المستقطب</td></tr>
+        <tr><td style="padding:8px;font-weight:600;">الطاقة</td><td style="padding:8px;">تُعطي 17 كيلوجول (4 كيلوسعرة) لكل غرام</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--gold)"></span>تصنيف السكريات</div>
+    <table class="class-table">
+      <thead><tr><th>الصنف</th><th>التعريف</th><th>الصيغة الكيميائية</th><th>أمثلة</th><th>الوظيفة</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>السكريات الأحادية</strong><br><small style="color:var(--text-light)">Monosaccharides</small></td>
+          <td>أبسط أشكال السكريات، لا تتحلل بالماء إلى وحدات أصغر</td>
+          <td><span class="formula" style="font-size:.78rem;">C₆H₁₂O₆</span></td>
+          <td><span class="tag tag-gold">الغلوكوز</span><span class="tag tag-gold">الفركتوز</span><span class="tag tag-gold">الغالاكتوز</span></td>
+          <td>مصدر الطاقة المباشر للخلايا</td>
+        </tr>
+        <tr>
+          <td><strong>السكريات الثنائية</strong><br><small style="color:var(--text-light)">Disaccharides</small></td>
+          <td>تتكون من ارتباط أحاديين بكسر رابطة غليكوسيدية مع طرح جزيء ماء</td>
+          <td><span class="formula" style="font-size:.78rem;">C₁₂H₂₂O₁₁</span></td>
+          <td><span class="tag tag-gold">المالتوز</span><span class="tag tag-gold">السكروز</span><span class="tag tag-gold">اللاكتوز</span></td>
+          <td>نقل الطاقة وتخزينها مؤقتاً</td>
+        </tr>
+        <tr>
+          <td><strong>السكريات المتعددة</strong><br><small style="color:var(--text-light)">Polysaccharides</small></td>
+          <td>بوليمرات من مئات أو آلاف وحدات السكريات الأحادية المرتبطة بروابط غليكوسيدية</td>
+          <td><span class="formula" style="font-size:.78rem;">(C₆H₁₀O₅)ₙ</span></td>
+          <td><span class="tag tag-green">السليولوز</span><span class="tag tag-green">النشا</span><span class="tag tag-green">الغليكوجين</span></td>
+          <td>تخزين الطاقة، الدعم الهيكلي</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--gold)"></span>الرابطة الغليكوسيدية</div>
+      <p style="font-size:.9rem;margin-bottom:16px;">تتحد السكريات الأحادية فيما بينها عبر <strong>رابطة غليكوسيدية</strong> مع طرح جزيء ماء (تفاعل التكثيف):</p>
+      <div class="bond-diagram">
+        <div>سكر أحادي (1)</div>
+        <div class="arrow">+</div>
+        <div>سكر أحادي (2)</div>
+        <div class="arrow">→</div>
+        <div class="highlight">سكر ثنائي</div>
+        <div class="arrow">+</div>
+        <div>H₂O</div>
+        <div class="note">مثال: الغلوكوز + الفركتوز → السكروز + H₂O</div>
+      </div>
+    </div>
+    <div class="chart-wrap" style="margin-bottom:0;">
+      <h3>📊 مقارنة السكريات الأحادية الرئيسية</h3>
+      <div class="chart-container"><canvas id="sugarChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:24px;">
+    <div class="card-title"><span class="dot" style="background:var(--gold)"></span>السكريات المتعددة الرئيسية مقارنة</div>
+    <table class="class-table">
+      <thead><tr><th>السكر المتعدد</th><th>مصدره</th><th>وحدة البناء</th><th>نوع الرابطة</th><th>الوظيفة</th></tr></thead>
+      <tbody>
+        <tr><td><strong>النشا</strong></td><td>النباتات</td><td>الغلوكوز</td><td>α-1,4 و α-1,6</td><td>تخزين الطاقة في النباتات</td></tr>
+        <tr><td><strong>الغليكوجين</strong></td><td>الحيوانات (الكبد والعضلات)</td><td>الغلوكوز</td><td>α-1,4 و α-1,6 (أكثر تفرعاً)</td><td>تخزين الطاقة في الحيوانات</td></tr>
+        <tr><td><strong>السليولوز</strong></td><td>جدار الخلية النباتية</td><td>الغلوكوز</td><td>β-1,4</td><td>الدعم الهيكلي، غير قابل للهضم</td></tr>
+        <tr><td><strong>الكيتين</strong></td><td>الفطريات وهيكل الحشرات</td><td>N-أستيل غلوكوزامين</td><td>β-1,4</td><td>الدعم الهيكلي الخارجي</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec-divider"></div>
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--gold)"></span>❓ أسئلة شائعة حول السكريات</div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">ما الفرق بين الغلوكوز والفركتوز؟ <span class="faq-arrow">▼</span></button>
+        <div class="faq-a"><div class="faq-a-inner">كلاهما سكريات أحادية بنفس الصيغة الكيميائية C₆H₁₂O₆ (متشابهات بنيوية)، لكنهما يختلفان في التركيب الفراغي. الغلوكوز يحتوي على مجموعة ألدهيد (سكر ألدوزي) بينما الفركتوز يحتوي على مجموعة كيتون (سكر كيتوزي). الغلوكوز هو الوقود الأساسي للخلايا، بينما الفركتوز يُوجد في الفواكه وأحلى مذاقاً.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">لماذا السليولوز غير قابل للهضم عند الإنسان؟ <span class="faq-arrow">▼</span></button>
+        <div class="faq-a"><div class="faq-a-inner">يرتبط الغلوكوز في السليولوز بروابط β-1,4 غليكوسيدية، بينما يمتلك الإنسان فقط إنزيم الأميلاز الذي يهضم روابط α-1,4. لا يمتلك الإنسان إنزيم السيلولاز اللازم لكسر روابط β، لذا يمر السليولوز عبر الجهاز الهضمي دون هضم، مما يجعله ألياف غذائية مفيدة لحركة الأمعاء.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">ما وظيفة الغليكوجين في جسم الإنسان؟ <span class="faq-arrow">▼</span></button>
+        <div class="faq-a"><div class="faq-a-inner">الغليكوجين هو شكل تخزين الغلوكوز في جسم الإنسان. يُخزَّن أساساً في الكبد (حوالي 100 غرام) والعضلات (حوالي 400 غرام). عند انخفاض مستوى السكر في الدم، يتحلل الغليكوجين الكبدي إلى غلوكوز ويُطلق في الدم. أما الغليكوجين العضلي فيُستخدم مباشرة كوقود للعضلات أثناء التمرين.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">ما الفرق بين النشا والغليكوجين؟ <span class="faq-arrow">▼</span></button>
+        <div class="faq-a"><div class="faq-a-inner">كلاهما بوليمرات من الغلوكوز بروابط α-1,4 وα-1,6، لكن الغليكوجين أكثر تفرعاً من النشا (تفرع كل 8-12 وحدة مقابل كل 24-30 وحدة في النشا). النشا يُوجد في النباتات، بينما الغليكوجين في الحيوانات. التفرع الأكبر في الغليكوجين يسمح بإطلاق الغلوكوز بسرعة أكبر عند الحاجة.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== LIPIDS ===== -->
+<div id="lipids" class="section">
+  <div class="sec-header">
+    <span class="sec-icon">🫧</span>
+    <h2>الدهنيات (الليبيدات)</h2>
+    <p class="sub">Lipids — Les Lipides — الدهنيات</p>
+  </div>
+
+  <div class="def-box green">
+    <div class="def-label">التعريف العلمي</div>
+    <p><strong>الدهنيات</strong> (أو الليبيدات) هي مجموعة متنوعة من <strong>المركبات العضوية الكارهة للماء</strong> (Hydrophobic) التي تذوب في المذيبات العضوية غير القطبية (كالإيثر والكلوروفورم) ولا تذوب في الماء. تتكون أساساً من عناصر الكربون (C) والهيدروجين (H) والأكسجين (O)، مع نسبة أكسجين منخفضة جداً مقارنةً بالسكريات.</p>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--green)"></span>التركيبة الكيميائية الأساسية</div>
+      <p style="font-size:.9rem;margin-bottom:12px;">تتكون معظم الدهنيات من وحدتين أساسيتين:</p>
+      <div style="background:#f0fdf4;border-radius:10px;padding:14px;margin-bottom:10px;">
+        <div style="font-weight:700;color:#166534;margin-bottom:4px;">الغليسيرول (Glycerol)</div>
+        <div style="font-family:monospace;font-size:.85rem;color:var(--text-light);">كحول ثلاثي الهيدروكسيل — C₃H₈O₃ — يُشكّل العمود الفقري للدهون الثلاثية</div>
+      </div>
+      <div style="background:#f0fdf4;border-radius:10px;padding:14px;">
+        <div style="font-weight:700;color:#166534;margin-bottom:4px;">الأحماض الدهنية (Fatty Acids)</div>
+        <div style="font-family:monospace;font-size:.85rem;color:var(--text-light);">سلاسل هيدروكربونية طويلة + مجموعة كربوكسيل (COOH)</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--green)"></span>الخصائص الفيزيائية والكيميائية</div>
+      <table style="width:100%;font-size:.88rem;border-collapse:collapse;">
+        <tr><td style="padding:8px;border-bottom:1px solid var(--border);font-weight:600;"><span class="tag tag-green">خاصية أساسية</span></td><td style="padding:8px;border-bottom:1px solid var(--border);">الكره المائي (Hydrophobicity)</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid var(--border);font-weight:600;">الذوبان</td><td style="padding:8px;border-bottom:1px solid var(--border);">في المذيبات العضوية (إيثر، كلوروفورم)</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid var(--border);font-weight:600;">الطاقة المُنتَجة</td><td style="padding:8px;border-bottom:1px solid var(--border);">37 كيلوجول/غرام (أعلى من السكريات)</td></tr>
+        <tr><td style="padding:8px;font-weight:600;">الكثافة</td><td style="padding:8px;">أقل من الماء (تطفو على سطحه)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--green)"></span>أنواع الدهنيات الرئيسية</div>
+    <div class="lipid-types">
+      <div class="lipid-type">
+        <div class="lt-icon">🔴</div>
+        <h4>الدهون الثلاثية (Triglycerides)</h4>
+        <p>تتكون من جزيء غليسيرول مرتبط بثلاثة أحماض دهنية عبر روابط إسترية. هي الشكل الرئيسي لتخزين الطاقة في الأنسجة الدهنية.</p>
+        <div style="margin-top:8px;"><span class="tag tag-green">الدهون الحيوانية</span><span class="tag tag-green">الزيوت النباتية</span></div>
+      </div>
+      <div class="lipid-type">
+        <div class="lt-icon">🔵</div>
+        <h4>الفوسفوليبيدات (Phospholipids)</h4>
+        <p>تتكون من غليسيرول + حمضين دهنيين + مجموعة فوسفات. تتميّز بطبيعتها المزدوجة (محبة وكارهة للماء) مما يجعلها مكوّن الغشاء الخلوي الأساسي.</p>
+        <div style="margin-top:8px;"><span class="tag tag-blue">الليسيثين</span><span class="tag tag-blue">السيفالين</span></div>
+      </div>
+      <div class="lipid-type">
+        <div class="lt-icon">🟡</div>
+        <h4>الستيرويدات (Steroids)</h4>
+        <p>تتميّز ببنيتها الحلقية المعقدة (4 حلقات مدمجة). تشمل الكولسترول والهرمونات الجنسية وهرمونات الكورتيزول وفيتامين D.</p>
+        <div style="margin-top:8px;"><span class="tag tag-gold">الكولسترول</span><span class="tag tag-gold">التستوستيرون</span><span class="tag tag-gold">الإستروجين</span></div>
+      </div>
+      <div class="lipid-type">
+        <div class="lt-icon">🟢</div>
+        <h4>الشموع (Waxes)</h4>
+        <p>إسترات من أحماض دهنية طويلة السلسلة مع كحولات طويلة. توفر حماية مقاومة للماء للأوراق والجلد والريش.</p>
+        <div style="margin-top:8px;"><span class="tag tag-teal">شمع النحل</span><span class="tag tag-teal">الكيوتين</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--green)"></span>الفوسفوليبيد وغشاء الخلية</div>
+      <p style="font-size:.88rem;margin-bottom:14px;">يتميّز الفوسفوليبيد بطبيعته <strong>المزدوجة (Amphipathic)</strong>:</p>
+      <div class="phospho-diagram">
+        <div class="phospho-head">رأس قطبي (محب للماء) 💧</div>
+        <div class="phospho-tail">|</div>
+        <div class="phospho-tail">ذيلان هيدروكربونيان (كارهان للماء)</div>
+        <div class="phospho-tail">|</div>
+        <div class="phospho-head">رأس قطبي (محب للماء) 💧</div>
+        <div class="phospho-sep">الطبقة الثنائية الدهنية: تُشكّل الحاجز الأساسي للغشاء الخلوي</div>
+      </div>
+    </div>
+    <div class="chart-wrap" style="margin-bottom:0;">
+      <h3>📊 مقارنة محتوى الطاقة في الدهنيات والسكريات والبروتينات</h3>
+      <div class="chart-container"><canvas id="lipidEnergyChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:24px;">
+    <div class="card-title"><span class="dot" style="background:var(--green)"></span>الوظائف الحيوية للدهنيات</div>
+    <div class="func-grid">
+      <div class="func-card"><div class="fc-icon">⚡</div><h4>تخزين الطاقة</h4><p>تُعطي ضعف طاقة الكربوهيدرات (37 كيلوجول/غ)</p></div>
+      <div class="func-card"><div class="fc-icon">🧱</div><h4>بناء الأغشية</h4><p>الفوسفوليبيدات تُشكّل الطبقة الثنائية للأغشية الخلوية</p></div>
+      <div class="func-card"><div class="fc-icon">🔬</div><h4>خلق الهرمونات</h4><p>الكولسترول هو السلف لهرمونات الستيرويد</p></div>
+      <div class="func-card"><div class="fc-icon">💊</div><h4>نقل الفيتامينات</h4><p>تُذيب وتنقل الفيتامينات الدهنية (A, D, E, K)</p></div>
+      <div class="func-card"><div class="fc-icon">🛡️</div><h4>العزل والحماية</h4><p>العزل الحراري وحماية الأعضاء الداخلية</p></div>
+      <div class="func-card"><div class="fc-icon">📡</div><h4>الإشارات الخلوية</h4><p>بعض الدهنيات تعمل كرسائل كيميائية بين الخلايا</p></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--green)"></span>الأحماض الدهنية: مشبعة وغير مشبعة</div>
+    <table class="class-table">
+      <thead><tr><th>النوع</th><th>التركيب</th><th>الحالة الفيزيائية</th><th>المصدر</th><th>التأثير الصحي</th></tr></thead>
+      <tbody>
+        <tr><td><strong>مشبعة</strong></td><td>روابط أحادية فقط بين ذرات C</td><td>صلبة في درجة حرارة الغرفة</td><td>الدهون الحيوانية، زيت جوز الهند</td><td>ترفع الكولسترول الضار</td></tr>
+        <tr><td><strong>غير مشبعة أحادية</strong></td><td>رابطة مزدوجة واحدة</td><td>سائلة في درجة حرارة الغرفة</td><td>زيت الزيتون، الأفوكادو</td><td>تحسّن صحة القلب</td></tr>
+        <tr><td><strong>غير مشبعة متعددة</strong></td><td>روابط مزدوجة متعددة</td><td>سائلة</td><td>زيت السمك، المكسرات</td><td>أوميغا-3 مفيد جداً للقلب</td></tr>
+        <tr><td><strong>متحولة (Trans)</strong></td><td>روابط مزدوجة بتشكّل Trans</td><td>شبه صلبة</td><td>المارغرين، الأطعمة المصنّعة</td><td>ضارة جداً بالقلب والأوعية</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec-divider"></div>
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--green)"></span>❓ أسئلة شائعة حول الدهنيات</div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">لماذا الدهنيات لا تذوب في الماء؟ <span class="faq-arrow">▼</span></button>
+        <div class="faq-a"><div class="faq-a-inner">الدهنيات تتكون أساساً من سلاسل هيدروكربونية غير قطبية. جزيئات الماء قطبية وتتجاذب مع بعضها بروابط هيدروجينية قوية. الجزيئات غير القطبية للدهنيات لا تستطيع تكوين روابط هيدروجينية مع الماء، لذا تُعزل من قِبل جزيئات الماء وتتجمع معاً بعيداً عنه (ظاهرة الكره المائي).</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">ما دور الكولسترول في الجسم؟ <span class="faq-arrow">▼</span></button>
+        <div class="faq-a"><div class="faq-a-inner">الكولسترول ضروري للجسم رغم سمعته السيئة. يُشكّل جزءاً من الغشاء الخلوي ويُنظّم مرونته وسيولته. هو السلف لتصنيع هرمونات الستيرويد (التستوستيرون، الإستروجين، الكورتيزول) وفيتامين D وأملاح الصفراء. المشكلة تكمن في ارتفاعه المفرط في الدم مما يؤدي إلى تصلب الشرايين.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">ما الفرق بين الدهون الثلاثية والفوسفوليبيدات؟ <span class="faq-arrow">▼</span></button>
+        <div class="faq-a"><div class="faq-a-inner">الدهون الثلاثية تتكون من غليسيرول + 3 أحماض دهنية، وهي كارهة للماء بالكامل، وظيفتها الأساسية تخزين الطاقة. الفوسفوليبيدات تتكون من غليسيرول + 2 حمض دهني + مجموعة فوسفات، وهي مزدوجة الطبيعة (رأس محب للماء + ذيل كاره للماء)، وظيفتها الأساسية بناء الأغشية الخلوية.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">لماذا الدهنيات تُعطي طاقة أكثر من السكريات؟ <span class="faq-arrow">▼</span></button>
+        <div class="faq-a"><div class="faq-a-inner">الدهنيات تحتوي على نسبة أكسجين أقل بكثير من السكريات، مما يعني أن ذراتها أكثر اختزالاً. عند أكسدة الدهنيات في التنفس الخلوي، تُطلق طاقة أكبر (37 كيلوجول/غ مقابل 17 كيلوجول/غ للسكريات). هذا يجعل الدهنيات مخزناً ممتازاً للطاقة على المدى الطويل.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== PROTEINS ===== -->
+<div id="proteins" class="section">
+  <div class="sec-header">
+    <span class="sec-icon">🧬</span>
+    <h2>البروتينات</h2>
+    <p class="sub">Proteins — Les Protéines — البروتينات</p>
+  </div>
+
+  <div class="def-box purple">
+    <div class="def-label">التعريف العلمي</div>
+    <p><strong>البروتينات</strong> هي جزيئات حيوية ضخمة تتكون من سلسلة أو أكثر من <strong>الأحماض الأمينية</strong> المرتبطة بروابط ببتيدية. تتركّب كيميائياً من: الكربون (C)، الهيدروجين (H)، الأكسجين (O)، <strong>النيتروجين (N)</strong>، والكبريت (S) كمكونات أساسية. تُعدّ البروتينات أكثر الجزيئات الحيوية تنوعاً وظيفياً في الكائنات الحية.</p>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--purple)"></span>الحمض الأميني — وحدة البناء</div>
+      <p style="font-size:.88rem;margin-bottom:14px;">يتكون كل حمض أميني من <strong>4 مجموعات</strong> مرتبطة بكربون ألفا (Cα):</p>
+      <div class="aa-visual">
+        <div style="margin-bottom:12px;font-size:.8rem;color:#94a3b8;">بنية الحمض الأميني العامة</div>
+        <div>
+          <span class="aa-group amino">—H₂N</span>
+          <span style="color:#94a3b8;margin:0 8px;">—</span>
+          <span class="aa-group alpha">Cα</span>
+          <span style="color:#94a3b8;margin:0 8px;">—</span>
+          <span class="aa-group carboxyl">COOH—</span>
+        </div>
+        <div style="margin-top:8px;">
+          <span class="aa-group r">R (السلسلة الجانبية)</span>
+        </div>
+        <div style="margin-top:12px;font-size:.75rem;color:#94a3b8;">
+          مجموعة أمين (NH₂) + كربون ألفا + مجموعة كربوكسيل (COOH) + سلسلة جانبية (R)
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--purple)"></span>الرابطة الببتيدية</div>
+      <p style="font-size:.88rem;margin-bottom:14px;">تتحد الأحماض الأمينية بروابط ببتيدية (تفاعل تكثيف مع طرح H₂O):</p>
+      <div class="bond-diagram">
+        <div style="font-size:.85rem;">H₂N—CHR₁—COOH</div>
+        <div class="arrow">+</div>
+        <div style="font-size:.85rem;">H₂N—CHR₂—COOH</div>
+        <div class="arrow">→</div>
+        <div class="highlight" style="font-size:.85rem;">H₂N—CHR₁—CO—<span style="color:#f87171">NH</span>—CHR₂—COOH</div>
+        <div class="arrow">+</div>
+        <div>H₂O</div>
+        <div class="note">الرابطة الببتيدية: —CO—NH— (رابطة تساهمية)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--purple)"></span>الأحماض الأمينية العشرون الأساسية</div>
+    <p style="font-size:.88rem;margin-bottom:14px;">تتكون البروتينات من 20 حمضاً أمينياً قياسياً، تُصنَّف حسب طبيعة سلسلتها الجانبية (R):</p>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+      <div style="background:#faf5ff;border-radius:10px;padding:14px;border:1px solid #ddd6fe;">
+        <div style="font-weight:700;color:var(--purple);margin-bottom:8px;">🔵 أحماض أمينية أساسية (لا يصنعها الجسم)</div>
+        <div style="font-size:.85rem;color:var(--text-light);">فالين، ليوسين، إيزوليوسين، ليزين، ميثيونين، فينيل ألانين، ثريونين، تريبتوفان، هيستيدين (9 أحماض)</div>
+      </div>
+      <div style="background:#f0fdf4;border-radius:10px;padding:14px;border:1px solid #bbf7d0;">
+        <div style="font-weight:700;color:var(--green);margin-bottom:8px;">🟢 أحماض أمينية غير أساسية (يصنعها الجسم)</div>
+        <div style="font-size:.85rem;color:var(--text-light);">غليسين، ألانين، سيرين، سيستين، تيروزين، أسبارتات، غلوتامات، أسباراجين، غلوتامين، أرجينين، برولين (11 حمضاً)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--purple)"></span>مستويات البنية البروتينية الأربعة</div>
+    <div class="struct-levels">
+      <div class="struct-level">
+        <div class="lvl-num" style="background:#ddd6fe;color:#6d28d9;">I</div>
+        <h4>البنية الأولية (Primary)</h4>
+        <p>التسلسل الخطي للأحماض الأمينية المرتبطة بروابط ببتيدية. تُحدَّد بالجينات وهي أساس كل البنيات الأخرى.</p>
+        <div style="margin-top:8px;"><span class="tag tag-purple">روابط ببتيدية</span><span class="tag tag-purple">تسلسل AA</span></div>
+      </div>
+      <div class="struct-level">
+        <div class="lvl-num" style="background:#c4b5fd;color:#5b21b6;">II</div>
+        <h4>البنية الثانوية (Secondary)</h4>
+        <p>بنيات محلية منتظمة تنشأ من الروابط الهيدروجينية بين مجموعات الأميد: اللولب ألفا (α-helix) وصحيفة بيتا (β-sheet).</p>
+        <div style="margin-top:8px;"><span class="tag tag-purple">روابط هيدروجينية</span><span class="tag tag-purple">α-helix</span><span class="tag tag-purple">β-sheet</span></div>
+      </div>
+      <div class="struct-level">
+        <div class="lvl-num" style="background:#a78bfa;color:#4c1d95;">III</div>
+        <h4>البنية الثالثية (Tertiary)</h4>
+        <p>الشكل الثلاثي الأبعاد الكامل للسلسلة البولي ببتيدية الواحدة، ناتج عن تفاعلات بين السلاسل الجانبية (R): روابط ثاني كبريتيد، روابط هيدروجينية، تفاعلات كارهة للماء.</p>
+        <div style="margin-top:8px;"><span class="tag tag-purple">ثلاثي الأبعاد</span><span class="tag tag-purple">روابط S-S</span></div>
+      </div>
+      <div class="struct-level">
+        <div class="lvl-num" style="background:#7c3aed;color:#fff;">IV</div>
+        <h4>البنية الرباعية (Quaternary)</h4>
+        <p>ترتيب وتجمّع سلسلتين ببتيديتين أو أكثر معاً. لا توجد في جميع البروتينات. مثال: الهيموغلوبين (4 سلاسل).</p>
+        <div style="margin-top:8px;"><span class="tag tag-purple">وحدات فرعية</span><span class="tag tag-purple">الهيموغلوبين</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="chart-wrap">
+      <h3>📊 توزيع الأحماض الأمينية الأساسية وغير الأساسية</h3>
+      <div class="chart-container"><canvas id="aaChart"></canvas></div>
+    </div>
+    <div class="chart-wrap">
+      <h3>📊 الوظائف الرئيسية للبروتينات</h3>
+      <div class="chart-container"><canvas id="proteinFuncChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--purple)"></span>أنواع البروتينات حسب الوظيفة</div>
+    <div class="prot-types">
+      <div class="prot-type">
+        <h4>🔬 البروتينات الإنزيمية</h4>
+        <p>تُسرّع التفاعلات الكيميائية الحيوية دون أن تُستهلك. أكثر أنواع البروتينات شيوعاً.</p>
+        <div class="examples"><span class="tag tag-purple">الأميلاز</span><span class="tag tag-purple">الليباز</span><span class="tag tag-purple">DNA بوليميراز</span></div>
+      </div>
+      <div class="prot-type">
+        <h4>🏗️ البروتينات البنائية</h4>
+        <p>تُشكّل الهيكل الخلوي والأنسجة الضامة وتُعطي الخلايا شكلها وصلابتها.</p>
+        <div class="examples"><span class="tag tag-purple">الكولاجين</span><span class="tag tag-purple">الكيراتين</span><span class="tag tag-purple">الأكتين</span></div>
+      </div>
+      <div class="prot-type">
+        <h4>🚚 بروتينات النقل</h4>
+        <p>تنقل الجزيئات والأيونات عبر الغشاء الخلوي أو في الدم.</p>
+        <div class="examples"><span class="tag tag-purple">الهيموغلوبين</span><span class="tag tag-purple">الألبومين</span><span class="tag tag-purple">الترانسفيرين</span></div>
+      </div>
+      <div class="prot-type">
+        <h4>🛡️ بروتينات الدفاع المناعي</h4>
+        <p>تُعرَّف بالأجسام المضادة (Antibodies)، تتعرف على الأجسام الغريبة وتُبطلها.</p>
+        <div class="examples"><span class="tag tag-purple">IgG</span><span class="tag tag-purple">IgM</span><span class="tag tag-purple">IgA</span></div>
+      </div>
+      <div class="prot-type">
+        <h4>📡 بروتينات الإشارة والتنظيم</h4>
+        <p>تشمل الهرمونات البروتينية والمستقبلات الخلوية التي تنقل الإشارات.</p>
+        <div class="examples"><span class="tag tag-purple">الأنسولين</span><span class="tag tag-purple">الغلوكاغون</span><span class="tag tag-purple">هرمون النمو</span></div>
+      </div>
+      <div class="prot-type">
+        <h4>⚡ بروتينات الحركة</h4>
+        <p>تُولّد القوة الميكانيكية اللازمة للحركة الخلوية وانقباض العضلات.</p>
+        <div class="examples"><span class="tag tag-purple">الميوزين</span><span class="tag tag-purple">الداينين</span><span class="tag tag-purple">الكينيزين</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--purple)"></span>الإنزيمات — بروتينات حيوية خاصة</div>
+    <p style="font-size:.9rem;margin-bottom:16px;">الإنزيمات هي <strong>محفّزات بيولوجية</strong> تُسرّع التفاعلات الكيميائية الحيوية دون أن تتغير. لكل إنزيم <strong>موقع فعّال</strong> (Active Site) يرتبط بركيزة محددة (خصوصية الإنزيم):</p>
+    <div class="enzyme-diagram">
+      <div class="enzyme-step">
+        <div class="enzyme-box">الإنزيم (E)</div>
+        <div class="enzyme-arrow">+</div>
+        <div class="enzyme-box substrate">الركيزة (S)</div>
+        <div class="enzyme-arrow">→</div>
+        <div class="enzyme-box complex">معقد E-S</div>
+        <div class="enzyme-arrow">→</div>
+        <div class="enzyme-box product">النواتج (P)</div>
+        <div class="enzyme-arrow">+</div>
+        <div class="enzyme-box">الإنزيم (E)</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px;">
+      <div style="background:var(--gray-100);border-radius:8px;padding:12px;text-align:center;">
+        <div style="font-weight:700;font-size:.85rem;margin-bottom:4px;">🌡️ تأثير درجة الحرارة</div>
+        <div style="font-size:.8rem;color:var(--text-light);">الأمثل: 37°C للإنزيمات البشرية. الحرارة الزائدة تُشوّه البنية (تمسّخ)</div>
+      </div>
+      <div style="background:var(--gray-100);border-radius:8px;padding:12px;text-align:center;">
+        <div style="font-weight:700;font-size:.85rem;margin-bottom:4px;">⚗️ تأثير pH</div>
+        <div style="font-size:.8rem;color:var(--text-light);">كل إنزيم له pH مثالي. البيبسين: pH 2، الأميلاز: pH 7</div>
+      </div>
+      <div style="background:var(--gray-100);border-radius:8px;padding:12px;text-align:center;">
+        <div style="font-weight:700;font-size:.85rem;margin-bottom:4px;">🎯 الخصوصية</div>
+        <div style="font-size:.8rem;color:var(--text-light);">كل إنزيم يعمل على ركيزة محددة فقط (نموذج القفل والمفتاح)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-divider"></div>
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--purple)"></span>❓ أسئلة شائعة حول البروتينات</div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">ما الفرق بين الحمض الأميني الأساسي وغير الأساسي؟ <span class="faq-arrow">▼</span></button>
+        <div class="faq-a"><div class="faq-a-inner">الأحماض الأمينية الأساسية (9 أحماض) هي التي لا يستطيع جسم الإنسان تصنيعها بنفسه، لذا يجب الحصول عليها من الغذاء. أما الأحماض الأمينية غير الأساسية (11 حمضاً) فيستطيع الجسم تصنيعها من مركبات أخرى. البروتينات الحيوانية (اللحوم، البيض، الحليب) تحتوي على جميع الأحماض الأمينية الأساسية وتُسمى بروتينات كاملة.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">ما المقصود بتمسّخ البروتين (Dénaturation)؟ <span class="faq-arrow">▼</span></button>
+        <div class="faq-a"><div class="faq-a-inner">تمسّخ البروتين هو فقدان بنيته الثلاثية الأبعاد (البنية الثانوية والثالثية والرباعية) دون كسر الروابط الببتيدية. يحدث بسبب الحرارة الزائدة، التغيرات الشديدة في pH، أو المواد الكيميائية. مثال: طهي البيض يُمسّخ بروتين الألبومين (يتحول من شفاف إلى أبيض). التمسّخ يُفقد الإنزيمات نشاطها لأنه يُشوّه موقعها الفعّال.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">لماذا الهيموغلوبين بروتين مهم جداً؟ <span class="faq-arrow">▼</span></button>
+        <div class="faq-a"><div class="faq-a-inner">الهيموغلوبين هو بروتين نقل الأكسجين في كريات الدم الحمراء. يتكون من 4 سلاسل ببتيدية (بنية رباعية) كل منها يحمل مجموعة هيم تحتوي على ذرة حديد. يرتبط بالأكسجين في الرئتين ويُطلقه في الأنسجة. فقر الدم (الأنيميا) ينتج عن نقص الهيموغلوبين أو خلل في بنيته.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">كيف تعمل الأجسام المضادة في الدفاع المناعي؟ <span class="faq-arrow">▼</span></button>
+        <div class="faq-a"><div class="faq-a-inner">الأجسام المضادة (Immunoglobulins) هي بروتينات على شكل Y تُنتجها الخلايا البائية. كل جسم مضاد يمتلك موقعاً تفاعلياً محدداً يرتبط بمستضد (Antigen) معين على سطح الجراثيم أو الفيروسات. هذا الارتباط يُعطّل الجسم الغريب مباشرة أو يُعلّمه للتدمير من قِبل خلايا المناعة الأخرى.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== NUCLEIC ACIDS ===== -->
+<div id="nucleic" class="section">
+  <div class="sec-header">
+    <span class="sec-icon">🔵</span>
+    <h2>الأحماض النووية</h2>
+    <p class="sub">Nucleic Acids — Les Acides Nucléiques</p>
+  </div>
+
+  <div class="def-box" style="background:linear-gradient(135deg,#eff6ff,#dbeafe);border-right-color:#3b82f6;">
+    <div class="def-label">التعريف العلمي</div>
+    <p><strong>الأحماض النووية</strong> هي بوليمرات من النيوكليوتيدات تُشكّل الجزيئات الحاملة للمعلومات الوراثية في الكائنات الحية. تتكون من عناصر: الكربون (C)، الهيدروجين (H)، الأكسجين (O)، <strong>النيتروجين (N)</strong>، و<strong>الفوسفور (P)</strong>. نوعان رئيسيان: <strong>DNA</strong> (حمض الديوكسي ريبونيوكليك) و<strong>RNA</strong> (حمض الريبونيوكليك).</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:#3b82f6"></span>وحدة البناء: النيوكليوتيد</div>
+    <p style="font-size:.9rem;margin-bottom:14px;">يتكون كل نيوكليوتيد من ثلاثة مكونات:</p>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:150px;background:#eff6ff;border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-size:1.5rem;margin-bottom:6px;">🍬</div>
+        <div style="font-weight:700;color:#1d4ed8;margin-bottom:4px;">سكر خماسي</div>
+        <div style="font-size:.82rem;color:var(--text-light);">ريبوز (RNA) أو ديوكسي ريبوز (DNA)</div>
+      </div>
+      <div style="flex:1;min-width:150px;background:#eff6ff;border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-size:1.5rem;margin-bottom:6px;">🔵</div>
+        <div style="font-weight:700;color:#1d4ed8;margin-bottom:4px;">قاعدة نيتروجينية</div>
+        <div style="font-size:.82rem;color:var(--text-light);">A, T/U, G, C</div>
+      </div>
+      <div style="flex:1;min-width:150px;background:#eff6ff;border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-size:1.5rem;margin-bottom:6px;">⚗️</div>
+        <div style="font-weight:700;color:#1d4ed8;margin-bottom:4px;">مجموعة فوسفات</div>
+        <div style="font-size:.82rem;color:var(--text-light);">PO₄³⁻ تُعطي الحمضية</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="na-card">
+    <div class="card-title" style="margin-bottom:0;"><span class="dot" style="background:var(--purple)"></span>مقارنة DNA و RNA</div>
+    <div class="na-compare">
+      <div class="na-type">
+        <h4 style="color:#1d4ed8;">🧬 DNA — حمض الديوكسي ريبونيوكليك</h4>
+        <table style="width:100%;font-size:.82rem;border-collapse:collapse;">
+          <tr><td style="padding:5px;border-bottom:1px solid #ddd6fe;font-weight:600;">البنية</td><td style="padding:5px;border-bottom:1px solid #ddd6fe;">شريط مزدوج (Double Helix)</td></tr>
+          <tr><td style="padding:5px;border-bottom:1px solid #ddd6fe;font-weight:600;">السكر</td><td style="padding:5px;border-bottom:1px solid #ddd6fe;">ديوكسي ريبوز</td></tr>
+          <tr><td style="padding:5px;border-bottom:1px solid #ddd6fe;font-weight:600;">القواعد</td><td style="padding:5px;border-bottom:1px solid #ddd6fe;">A, T, G, C</td></tr>
+          <tr><td style="padding:5px;border-bottom:1px solid #ddd6fe;font-weight:600;">الموقع</td><td style="padding:5px;border-bottom:1px solid #ddd6fe;">النواة (أساساً)</td></tr>
+          <tr><td style="padding:5px;font-weight:600;">الوظيفة</td><td style="padding:5px;">حفظ المعلومات الوراثية</td></tr>
+        </table>
+      </div>
+      <div class="na-type">
+        <h4 style="color:#7c3aed;">🔬 RNA — حمض الريبونيوكليك</h4>
+        <table style="width:100%;font-size:.82rem;border-collapse:collapse;">
+          <tr><td style="padding:5px;border-bottom:1px solid #ddd6fe;font-weight:600;">البنية</td><td style="padding:5px;border-bottom:1px solid #ddd6fe;">شريط مفرد (Single Strand)</td></tr>
+          <tr><td style="padding:5px;border-bottom:1px solid #ddd6fe;font-weight:600;">السكر</td><td style="padding:5px;border-bottom:1px solid #ddd6fe;">ريبوز</td></tr>
+          <tr><td style="padding:5px;border-bottom:1px solid #ddd6fe;font-weight:600;">القواعد</td><td style="padding:5px;border-bottom:1px solid #ddd6fe;">A, U, G, C (يوراسيل بدل ثيمين)</td></tr>
+          <tr><td style="padding:5px;border-bottom:1px solid #ddd6fe;font-weight:600;">الموقع</td><td style="padding:5px;border-bottom:1px solid #ddd6fe;">النواة والسيتوبلازم</td></tr>
+          <tr><td style="padding:5px;font-weight:600;">الوظيفة</td><td style="padding:5px;">نقل المعلومات وتصنيع البروتينات</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:#3b82f6"></span>أنواع RNA ووظائفها</div>
+    <table class="class-table">
+      <thead><tr><th>النوع</th><th>الاسم الكامل</th><th>الوظيفة</th></tr></thead>
+      <tbody>
+        <tr><td><strong>mRNA</strong></td><td>RNA المرسال (Messenger)</td><td>ينقل المعلومات الجينية من DNA إلى الريبوسوم لتصنيع البروتينات</td></tr>
+        <tr><td><strong>tRNA</strong></td><td>RNA الناقل (Transfer)</td><td>ينقل الأحماض الأمينية إلى الريبوسوم أثناء الترجمة</td></tr>
+        <tr><td><strong>rRNA</strong></td><td>RNA الريبوسومي (Ribosomal)</td><td>يُشكّل الجزء الأساسي من الريبوسومات حيث يتم تصنيع البروتينات</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:#3b82f6"></span>التدفق الجيني (Central Dogma)</div>
+    <div style="background:var(--blue-dark);border-radius:var(--radius);padding:24px;color:var(--white);text-align:center;">
+      <div style="display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;font-size:.95rem;">
+        <div style="background:#1d4ed8;border-radius:10px;padding:12px 20px;font-weight:700;">DNA</div>
+        <div style="color:#60a5fa;font-size:1.2rem;">→</div>
+        <div style="background:#7c3aed;border-radius:10px;padding:12px 20px;font-weight:700;">RNA</div>
+        <div style="color:#60a5fa;font-size:1.2rem;">→</div>
+        <div style="background:#059669;border-radius:10px;padding:12px 20px;font-weight:700;">بروتين</div>
+      </div>
+      <div style="margin-top:16px;display:flex;justify-content:center;gap:32px;flex-wrap:wrap;font-size:.82rem;color:#94a3b8;">
+        <div>النسخ (Transcription)</div>
+        <div>الترجمة (Translation)</div>
+      </div>
+      <div style="margin-top:12px;font-size:.82rem;color:#94a3b8;">المبدأ المركزي للبيولوجيا الجزيئية: المعلومات تتدفق من DNA → RNA → بروتين</div>
+    </div>
+  </div>
+
+  <div class="sec-divider"></div>
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:#3b82f6"></span>❓ أسئلة شائعة حول الأحماض النووية</div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">ما الفرق بين DNA و RNA؟ <span class="faq-arrow">▼</span></button>
+        <div class="faq-a"><div class="faq-a-inner">DNA شريط مزدوج يحتوي على سكر الديوكسي ريبوز وقاعدة الثيمين (T)، يوجد في النواة ويحفظ المعلومات الوراثية. RNA شريط مفرد يحتوي على سكر الريبوز وقاعدة اليوراسيل (U) بدل الثيمين، يوجد في النواة والسيتوبلازم ويعمل كوسيط لنقل المعلومات وتصنيع البروتينات.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">لماذا DNA يتكون من شريطين متكاملين؟ <span class="faq-arrow">▼</span></button>
+        <div class="faq-a"><div class="faq-a-inner">البنية الحلزونية المزدوجة لـ DNA تُوفّر مزايا عدة: تحمي المعلومات الجينية من التلف (إذا تضرر شريط يُصلح باستخدام الشريط الآخر كقالب)، وتُسهّل عملية النسخ والتضاعف. القواعد النيتروجينية تترابط بشكل تكاملي: A مع T (رابطتان هيدروجينيتان) و G مع C (ثلاث روابط هيدروجينية).</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== COMPARE ===== -->
+<div id="compare" class="section">
+  <div class="sec-header">
+    <span class="sec-icon">📊</span>
+    <h2>المقارنة الشاملة بين الجزيئات الحيوية</h2>
+    <p class="sub">جدول مقارن وتحليل تفصيلي للسكريات والدهنيات والبروتينات والأحماض النووية</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--blue-light)"></span>الجدول المقارن الشامل</div>
+    <div style="overflow-x:auto;">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>الخاصية</th>
+            <th style="background:#92400e;color:#fff;">🍬 السكريات</th>
+            <th style="background:#065f46;color:#fff;">🫧 الدهنيات</th>
+            <th style="background:#4c1d95;color:#fff;">🧬 البروتينات</th>
+            <th style="background:#1e3a8a;color:#fff;">🔵 الأحماض النووية</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>العناصر الكيميائية</td><td>C, H, O</td><td>C, H, O (نسبة O منخفضة)</td><td>C, H, O, <strong>N, S</strong></td><td>C, H, O, <strong>N, P</strong></td></tr>
+          <tr><td>الصيغة العامة</td><td>Cₙ(H₂O)ₙ</td><td>غليسيرول + أحماض دهنية</td><td>سلاسل أحماض أمينية</td><td>سلاسل نيوكليوتيدات</td></tr>
+          <tr><td>وحدة البناء</td><td>السكر الأحادي (Monosaccharide)</td><td>الغليسيرول + الحمض الدهني</td><td>الحمض الأميني (Amino Acid)</td><td>النيوكليوتيد</td></tr>
+          <tr><td>نوع الرابطة</td><td>رابطة غليكوسيدية</td><td>رابطة إسترية</td><td>رابطة ببتيدية</td><td>رابطة فوسفوديإسترية</td></tr>
+          <tr><td>الطاقة (كيلوجول/غ)</td><td>17</td><td>37</td><td>17</td><td>—</td></tr>
+          <tr><td>الوظيفة الرئيسية</td><td>مصدر الطاقة الفوري</td><td>تخزين الطاقة، بناء الأغشية</td><td>إنزيمات، بنية، تنظيم، مناعة</td><td>حفظ ونقل المعلومات الوراثية</td></tr>
+          <tr><td>موقع التخزين</td><td>الكبد والعضلات (غليكوجين)</td><td>الأنسجة الدهنية</td><td>العضلات والأنسجة</td><td>النواة (DNA)</td></tr>
+          <tr><td>أمثلة</td><td>الغلوكوز، الغليكوجين، السليولوز</td><td>الدهون الثلاثية، الكولسترول</td><td>الهيموغلوبين، الكولاجين، الأنسولين</td><td>DNA، mRNA، tRNA</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="chart-wrap">
+      <h3>📊 مقارنة محتوى الطاقة (كيلوجول/غ)</h3>
+      <div class="chart-container"><canvas id="compareEnergyChart"></canvas></div>
+    </div>
+    <div class="chart-wrap">
+      <h3>📊 نسبة كل جزيء حيوي في جسم الإنسان (تقريباً)</h3>
+      <div class="chart-container"><canvas id="bodyCompChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="summary-box">
+    <h3>🔬 خلاصة علمية</h3>
+    <p>تُشكّل السكريات والدهنيات والبروتينات والأحماض النووية معاً الركيزة الجزيئية للحياة. تتكامل وظائفها لتضمن استمرارية العمليات الحيوية: السكريات تُمدّ الخلايا بالطاقة الفورية، الدهنيات تُخزّن الطاقة وتُبني الأغشية، البروتينات تُنفّذ الوظائف الحيوية المتنوعة من التحفيز الإنزيمي إلى الدفاع المناعي، والأحماض النووية تحفظ وتنقل المعلومات الوراثية عبر الأجيال.</p>
+    <div class="summary-stats">
+      <div class="s-stat"><div class="s-num">4</div><div class="s-lbl">جزيئات حيوية كبرى</div></div>
+      <div class="s-stat"><div class="s-num">20</div><div class="s-lbl">حمضاً أمينياً أساسياً</div></div>
+      <div class="s-stat"><div class="s-num">5</div><div class="s-lbl">عناصر كيميائية أساسية</div></div>
+      <div class="s-stat"><div class="s-num">4</div><div class="s-lbl">مستويات بنية البروتين</div></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== QUIZ ===== -->
+<div id="quiz" class="section">
+  <div class="sec-header">
+    <span class="sec-icon">🧪</span>
+    <h2>اختبار تفاعلي</h2>
+    <p class="sub">اختبر معلوماتك حول الجزيئات الحيوية الكبرى</p>
+  </div>
+
+  <div class="quiz-wrap" id="quizContainer">
+    <div class="quiz-progress">
+      <div class="quiz-progress-bar" id="progressBar" style="width:0%"></div>
+    </div>
+    <div id="quizContent"></div>
+  </div>
+</div>
+
+</div><!-- end .main -->
+
+<footer>
+  <p>إعداد: <strong>سليمان الفوال — أيمن ولاد حسابن</strong></p>
+  <p style="margin-top:4px;">المؤسسة: <strong>ثانوية الحاج محمد بن احسابن الحضري</strong> | المستوى: <strong>أولى باك علوم تجريبية — خيار عربية</strong></p>
+  <p style="margin-top:4px;opacity:.6;">تم إعداد هذا العرض وفق مقاربة علمية تعتمد على تبسيط المفاهيم الأساسية للمواد الحيوية</p>
+</footer>
+
+<script>
+// ===== NAVIGATION =====
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(btn) btn.classList.add('active');
+  window.scrollTo({top: document.querySelector('.nav-wrap').offsetTop - 10, behavior:'smooth'});
+  if(id === 'quiz') initQuiz();
+}
+
+// ===== FAQ ACCORDION =====
+function toggleFaq(btn) {
+  const item = btn.closest('.faq-item');
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+  if(!isOpen) item.classList.add('open');
+}
+
+// ===== CHARTS =====
+const chartDefaults = {
+  plugins: { legend: { labels: { font: { family: 'Segoe UI, Tahoma, Arial, sans-serif', size: 12 } } } }
+};
+
+// Overview Energy Chart
+new Chart(document.getElementById('energyChart'), {
+  type: 'bar',
+  data: {
+    labels: ['السكريات', 'الدهنيات', 'البروتينات', 'الكحول (مرجع)'],
+    datasets: [{
+      label: 'كيلو جول / غرام',
+      data: [17, 37, 17, 29],
+      backgroundColor: ['#fbbf24','#34d399','#a78bfa','#94a3b8'],
+      borderRadius: 8
+    }]
+  },
+  options: { ...chartDefaults, responsive:true, maintainAspectRatio:false, plugins:{...chartDefaults.plugins, legend:{display:false}}, scales:{y:{beginAtZero:true}} }
+});
+
+// Overview Elements Chart (Radar)
+new Chart(document.getElementById('elementsChart'), {
+  type: 'radar',
+  data: {
+    labels: ['كربون C','هيدروجين H','أكسجين O','نيتروجين N','كبريت S'],
+    datasets: [
+      { label:'السكريات', data:[40,7,53,0,0], backgroundColor:'rgba(251,191,36,.2)', borderColor:'#fbbf24', pointBackgroundColor:'#fbbf24' },
+      { label:'الدهنيات', data:[77,12,11,0,0], backgroundColor:'rgba(52,211,153,.2)', borderColor:'#34d399', pointBackgroundColor:'#34d399' },
+      { label:'البروتينات', data:[50,7,23,16,4], backgroundColor:'rgba(167,139,250,.2)', borderColor:'#a78bfa', pointBackgroundColor:'#a78bfa' }
+    ]
+  },
+  options: { ...chartDefaults, responsive:true, maintainAspectRatio:false, scales:{r:{beginAtZero:true, max:80}} }
+});
+
+// Sugars Chart (Doughnut)
+new Chart(document.getElementById('sugarChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['الغالاكتوز','الفركتوز (سكر الفاكهة)','الغلوكوز','الدكستروز','المالتوز','السكروز'],
+    datasets: [{ data:[10,20,35,15,10,10], backgroundColor:['#92400e','#d97706','#fbbf24','#fde68a','#a16207','#78350f'], borderWidth:2 }]
+  },
+  options: { ...chartDefaults, responsive:true, maintainAspectRatio:false }
+});
+
+// Lipids Energy Chart
+new Chart(document.getElementById('lipidEnergyChart'), {
+  type: 'bar',
+  data: {
+    labels: ['الدهنيات', 'السكريات', 'البروتينات'],
+    datasets: [{
+      label: 'كيلوجول/غرام',
+      data: [37, 17, 17],
+      backgroundColor: ['#34d399','#fbbf24','#a78bfa'],
+      borderRadius: 8
+    }]
+  },
+  options: { ...chartDefaults, responsive:true, maintainAspectRatio:false, plugins:{...chartDefaults.plugins, legend:{display:false}}, scales:{y:{beginAtZero:true, max:45}} }
+});
+
+// Proteins AA Chart
+new Chart(document.getElementById('aaChart'), {
+  type: 'pie',
+  data: {
+    labels: ['أحماض أمينية أساسية (9)', 'أحماض أمينية غير أساسية (11)'],
+    datasets: [{ data:[9,11], backgroundColor:['#7c3aed','#c4b5fd'], borderWidth:2 }]
+  },
+  options: { ...chartDefaults, responsive:true, maintainAspectRatio:false }
+});
+
+// Proteins Function Chart
+new Chart(document.getElementById('proteinFuncChart'), {
+  type: 'bar',
+  data: {
+    labels: ['إنزيمية','بنائية','نقل','مناعية','تنظيمية','حركية'],
+    datasets: [{
+      label: 'الأهمية النسبية',
+      data: [30,20,15,15,12,8],
+      backgroundColor: ['#7c3aed','#6d28d9','#5b21b6','#4c1d95','#8b5cf6','#a78bfa'],
+      borderRadius: 6
+    }]
+  },
+  options: { ...chartDefaults, responsive:true, maintainAspectRatio:false, plugins:{...chartDefaults.plugins, legend:{display:false}}, scales:{y:{beginAtZero:true}} }
+});
+
+// Compare Energy Chart
+new Chart(document.getElementById('compareEnergyChart'), {
+  type: 'bar',
+  data: {
+    labels: ['السكريات', 'الدهنيات', 'البروتينات'],
+    datasets: [{
+      label: 'كيلوجول/غرام',
+      data: [17, 37, 17],
+      backgroundColor: ['#fbbf24','#34d399','#a78bfa'],
+      borderRadius: 8
+    }]
+  },
+  options: { ...chartDefaults, responsive:true, maintainAspectRatio:false, plugins:{...chartDefaults.plugins, legend:{display:false}}, scales:{y:{beginAtZero:true, max:45}} }
+});
+
+// Body Composition Chart
+new Chart(document.getElementById('bodyCompChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['الماء ~60%','البروتينات ~16%','الدهنيات ~14%','المعادن ~5%','السكريات ~2%','أخرى ~3%'],
+    datasets: [{ data:[60,16,14,5,2,3], backgroundColor:['#3b82f6','#7c3aed','#34d399','#94a3b8','#fbbf24','#e2e8f0'], borderWidth:2 }]
+  },
+  options: { ...chartDefaults, responsive:true, maintainAspectRatio:false }
+});
+
+// ===== QUIZ =====
+const quizQuestions = [
+  { q: 'ما الصيغة الكيميائية العامة للسكريات؟', opts: ['Cₙ(H₂O)ₙ','CₙHₙOₙ','CₙH₂ₙO₂ₙ','CₙHₙO₂ₙ'], ans: 0, exp: 'الصيغة العامة للسكريات هي Cₙ(H₂O)ₙ أو بصورة أدق Cₓ Hᵧ Oᵤ حيث z = y = 2x.' },
+  { q: 'كم كيلوجول تُعطي الدهنيات لكل غرام؟', opts: ['17 كيلوجول','29 كيلوجول','37 كيلوجول','45 كيلوجول'], ans: 2, exp: 'الدهنيات تُعطي 37 كيلوجول/غرام، وهو ضعف ما تُعطيه السكريات (17 كيلوجول/غرام).' },
+  { q: 'ما نوع الرابطة التي تربط الأحماض الأمينية في البروتينات؟', opts: ['رابطة غليكوسيدية','رابطة إسترية','رابطة ببتيدية','رابطة هيدروجينية'], ans: 2, exp: 'الأحماض الأمينية ترتبط برابطة ببتيدية (—CO—NH—) مع طرح جزيء ماء (تفاعل تكثيف).' },
+  { q: 'أي من هذه السكريات يُخزَّن في الكبد والعضلات عند الإنسان؟', opts: ['النشا','السليولوز','الغليكوجين','الكيتين'], ans: 2, exp: 'الغليكوجين هو شكل تخزين الغلوكوز في جسم الإنسان، يُخزَّن في الكبد (100 غ) والعضلات (400 غ).' },
+  { q: 'ما المكوّن الأساسي للغشاء الخلوي من الدهنيات؟', opts: ['الدهون الثلاثية','الفوسفوليبيدات','الستيرويدات','الشموع'], ans: 1, exp: 'الفوسفوليبيدات تُشكّل الطبقة الثنائية الدهنية للغشاء الخلوي بسبب طبيعتها المزدوجة (رأس محب للماء + ذيل كاره للماء).' },
+  { q: 'كم مستوى للبنية البروتينية يوجد؟', opts: ['2 مستويات','3 مستويات','4 مستويات','5 مستويات'], ans: 2, exp: 'للبروتينات 4 مستويات بنيوية: الأولية (تسلسل AA)، الثانوية (α-helix و β-sheet)، الثالثية (ثلاثي الأبعاد)، والرباعية (وحدات فرعية متعددة).' },
+  { q: 'ما العنصر الكيميائي الذي يُميّز البروتينات عن السكريات والدهنيات؟', opts: ['الكربون','الأكسجين','النيتروجين','الهيدروجين'], ans: 2, exp: 'النيتروجين (N) هو العنصر المميّز للبروتينات. السكريات والدهنيات تحتوي على C, H, O فقط، بينما البروتينات تحتوي إضافةً على N وS.' },
+  { q: 'ما وظيفة الإنزيمات في الجسم؟', opts: ['تخزين الطاقة','نقل الأكسجين','تسريع التفاعلات الكيميائية الحيوية','بناء الأغشية الخلوية'], ans: 2, exp: 'الإنزيمات هي محفّزات بيولوجية تُسرّع التفاعلات الكيميائية الحيوية دون أن تُستهلك. كل إنزيم خاص بركيزة محددة.' },
+  { q: 'ما الفرق الرئيسي بين DNA و RNA؟', opts: ['DNA شريط مفرد و RNA شريط مزدوج','DNA يحتوي ثيمين و RNA يحتوي يوراسيل','DNA في السيتوبلازم و RNA في النواة','DNA أصغر حجماً من RNA'], ans: 1, exp: 'DNA يحتوي على قاعدة الثيمين (T) بينما RNA يحتوي على اليوراسيل (U) بدلاً منها. كما أن DNA شريط مزدوج و RNA شريط مفرد.' },
+  { q: 'أي من هذه المركبات يُعدّ من الدهنيات الستيرويدية؟', opts: ['الغليسيرول','الكولسترول','الليسيثين','حمض الأوليك'], ans: 1, exp: 'الكولسترول هو ستيرويد يتميّز ببنيته الحلقية المعقدة (4 حلقات مدمجة). هو السلف لهرمونات الستيرويد وفيتامين D.' },
+  { q: 'ما نوع الرابطة التي تربط السكريات الأحادية لتكوين السكريات الثنائية؟', opts: ['رابطة ببتيدية','رابطة فوسفوديإسترية','رابطة غليكوسيدية','رابطة إسترية'], ans: 2, exp: 'السكريات الأحادية ترتبط برابطة غليكوسيدية مع طرح جزيء ماء (تفاعل التكثيف) لتكوين السكريات الثنائية والمتعددة.' },
+  { q: 'أي بروتين يحمل الأكسجين في الدم؟', opts: ['الأنسولين','الكولاجين','الهيموغلوبين','الكيراتين'], ans: 2, exp: 'الهيموغلوبين هو بروتين نقل الأكسجين في كريات الدم الحمراء. يتكون من 4 سلاسل ببتيدية (بنية رباعية) كل منها يحمل مجموعة هيم.' }
+];
+
+let currentQ = 0, score = 0, answered = false;
+
+function initQuiz() {
+  currentQ = 0; score = 0; answered = false;
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const container = document.getElementById('quizContent');
+  const bar = document.getElementById('progressBar');
+  if(currentQ >= quizQuestions.length) {
+    bar.style.width = '100%';
+    const pct = Math.round((score/quizQuestions.length)*100);
+    let msg = pct >= 80 ? '🎉 ممتاز! أنت متمكّن من المادة.' : pct >= 60 ? '👍 جيد! راجع بعض النقاط.' : '📚 راجع الدروس مجدداً.';
+    container.innerHTML = `<div class="quiz-score">
+      <div class="score-num">${score}/${quizQuestions.length}</div>
+      <div style="font-size:1.5rem;margin-top:8px;">${Math.round(pct)}%</div>
+      <p style="margin-top:12px;font-size:1rem;">${msg}</p>
+      <button class="restart-btn" onclick="initQuiz()">🔄 إعادة الاختبار</button>
+    </div>`;
+    return;
+  }
+  bar.style.width = ((currentQ/quizQuestions.length)*100) + '%';
+  const q = quizQuestions[currentQ];
+  answered = false;
+  container.innerHTML = `
+    <div class="quiz-q-num">السؤال ${currentQ+1} من ${quizQuestions.length}</div>
+    <div class="quiz-question">${q.q}</div>
+    <div class="quiz-options">
+      ${q.opts.map((o,i) => `<button class="quiz-opt" onclick="selectAnswer(${i})">${o}</button>`).join('')}
+    </div>
+    <div class="quiz-feedback" id="qFeedback"></div>
+    <div class="quiz-nav">
+      <span style="font-size:.85rem;color:var(--text-light);">النتيجة: ${score}/${currentQ}</span>
+      <button class="quiz-btn" id="nextBtn" onclick="nextQuestion()" disabled>التالي ←</button>
+    </div>`;
+}
+
+function selectAnswer(idx) {
+  if(answered) return;
+  answered = true;
+  const q = quizQuestions[currentQ];
+  const opts = document.querySelectorAll('.quiz-opt');
+  opts.forEach(o => o.disabled = true);
+  opts[idx].classList.add(idx === q.ans ? 'correct' : 'wrong');
+  if(idx !== q.ans) opts[q.ans].classList.add('correct');
+  const fb = document.getElementById('qFeedback');
+  fb.classList.add('show', idx === q.ans ? 'correct' : 'wrong');
+  fb.innerHTML = (idx === q.ans ? '✅ إجابة صحيحة! ' : '❌ إجابة خاطئة. ') + q.exp;
+  if(idx === q.ans) score++;
+  document.getElementById('nextBtn').disabled = false;
+}
+
+function nextQuestion() {
+  currentQ++;
+  renderQuestion();
+}
+
+// Init quiz on load if on quiz tab
+document.addEventListener('DOMContentLoaded', () => {});
+</script>
+</body>
+</html>
