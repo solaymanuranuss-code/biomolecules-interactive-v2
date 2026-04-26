@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,21 +7,47 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { tajawal: ['Tajawal', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
     <style>
-        body { font-family: 'Tajawal', sans-serif; scroll-behavior: smooth; }
+        body { font-family: 'Tajawal', sans-serif; scroll-behavior: smooth; transition: background-color 0.3s, color 0.3s; }
         .hero-gradient { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); }
+        .dark .hero-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); }
         .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .dark .glass-card { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); }
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.5s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
-        .accordion-item.active .accordion-content { max-height: 500px; }
-        .nav-link.active { border-bottom: 3px solid #3b82f6; color: #1e3a8a; font-weight: bold; }
+        .nav-link.active { border-bottom: 3px solid #3b82f6; color: #3b82f6; font-weight: bold; }
+        .dark .nav-link { color: #cbd5e1; }
+        .dark .nav-link.active { color: #60a5fa; border-bottom-color: #60a5fa; }
+        .dark body { background-color: #0f172a; color: #f1f5f9; }
+        .dark .bg-white { background-color: #1e293b; }
+        .dark .text-gray-800 { color: #f1f5f9; }
+        .dark .text-gray-600 { color: #94a3b8; }
+        .dark .bg-gray-50 { background-color: #0f172a; }
+        .dark .bg-blue-50 { background-color: #1e293b; border-color: #334155; }
+        .dark .bg-indigo-50 { background-color: #1e293b; border-color: #334155; }
+        .dark .bg-yellow-50 { background-color: #1e293b; border-color: #334155; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-50 text-gray-800 dark:bg-slate-900 dark:text-slate-200">
     <!-- Hero Section -->
     <header class="hero-gradient text-white py-16 px-4 text-center relative overflow-hidden">
+        <div class="absolute top-4 left-4 z-20">
+            <button onclick="toggleDarkMode()" class="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-all border border-white/20 shadow-lg" id="theme-toggle">
+                <span id="theme-icon-light">🌙</span>
+                <span id="theme-icon-dark" class="hidden">☀️</span>
+            </button>
+        </div>
         <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
             <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="w-full h-full"><path d="M0 100 C 20 0 50 0 100 100 Z" fill="white"></path></svg>
         </div>
@@ -33,11 +59,6 @@
             <p class="text-lg md:text-xl mb-8 text-blue-100 max-w-2xl mx-auto leading-relaxed">
                 دراسة أكاديمية شاملة للسكريات، الدهنيات، والبروتينات: تعريفها، أصنافها، تركيبها الكيميائي، ووظائفها الحيوية.
             </p>
-            <div class="flex flex-wrap justify-center gap-6 text-sm md:text-base">
-                <div class="flex items-center gap-2"><span class="w-3 h-3 bg-green-400 rounded-full"></span> 3 مجموعات رئيسية</div>
-                <div class="flex items-center gap-2"><span class="w-3 h-3 bg-yellow-400 rounded-full"></span> تركيب كيميائي دقيق</div>
-                <div class="flex items-center gap-2"><span class="w-3 h-3 bg-red-400 rounded-full"></span> وظائف حيوية أساسية</div>
-            </div>
             <div class="mt-8 pt-6 border-t border-blue-400 border-opacity-30">
                 <p class="text-blue-200 font-medium italic text-lg">إعداد الأستاذ: سليمان الغوال</p>
             </div>
@@ -45,7 +66,7 @@
     </header>
 
     <!-- Navigation -->
-    <nav class="sticky top-0 z-50 bg-white shadow-md overflow-x-auto whitespace-nowrap scrollbar-hide">
+    <nav class="sticky top-0 z-50 bg-white dark:bg-slate-800 shadow-md overflow-x-auto whitespace-nowrap scrollbar-hide">
         <div class="max-w-6xl mx-auto px-4 flex justify-between items-center h-16">
             <div class="flex gap-4 md:gap-8 h-full">
                 <button onclick="showTab('overview')" id="nav-overview" class="nav-link px-2 flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors active">🏠 نظرة عامة</button>
@@ -57,41 +78,42 @@
             </div>
         </div>
     </nav>
+
     <main class="max-w-6xl mx-auto px-4 py-12">
         <!-- Overview Tab -->
         <section id="overview" class="tab-content active">
             <div class="grid md:grid-cols-2 gap-12 items-center">
                 <div>
-                    <h2 class="text-3xl font-bold mb-6 text-blue-900 border-r-4 border-blue-600 pr-4">نظرة عامة على الجزيئات الحيوية (Biomolécules)</h2>
+                    <h2 class="text-3xl font-bold mb-6 text-blue-900 dark:text-blue-400 border-r-4 border-blue-600 pr-4">نظرة عامة على الجزيئات الحيوية (Biomolécules)</h2>
                     <p class="text-lg leading-relaxed mb-6">
                         تعتبر <strong>الجزيئات الحيوية الكبرى</strong> (Macromolécules) مركبات عضوية ضخمة تشكل البنية الأساسية للكائنات الحية وتؤدي وظائف حيوية جوهرية. تنقسم هذه الجزيئات إلى ثلاث مجموعات رئيسية:
                     </p>
                     <ul class="space-y-4">
-                        <li class="flex items-start gap-3 bg-white p-4 rounded-xl shadow-sm">
+                        <li class="flex items-start gap-3 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm">
                             <span class="text-2xl">🍬</span>
                             <div>
-                                <h4 class="font-bold text-blue-800">السكريات (Glucides)</h4>
-                                <p class="text-sm text-gray-600">المصدر الأساسي للطاقة السريعة للخلية.</p>
+                                <h4 class="font-bold text-blue-800 dark:text-blue-400">السكريات (Glucides)</h4>
+                                <p class="text-sm text-gray-600 dark:text-slate-400">المصدر الأساسي للطاقة السريعة للخلية.</p>
                             </div>
                         </li>
-                        <li class="flex items-start gap-3 bg-white p-4 rounded-xl shadow-sm">
+                        <li class="flex items-start gap-3 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm">
                             <span class="text-2xl">🫧</span>
                             <div>
-                                <h4 class="font-bold text-blue-800">الدهنيات (Lipides)</h4>
-                                <p class="text-sm text-gray-600">تخزين الطاقة طويلة الأمد وبناء الأغشية الخلوية.</p>
+                                <h4 class="font-bold text-blue-800 dark:text-blue-400">الدهنيات (Lipides)</h4>
+                                <p class="text-sm text-gray-600 dark:text-slate-400">تخزين الطاقة طويلة الأمد وبناء الأغشية الخلوية.</p>
                             </div>
                         </li>
-                        <li class="flex items-start gap-3 bg-white p-4 rounded-xl shadow-sm">
+                        <li class="flex items-start gap-3 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm">
                             <span class="text-2xl">🧬</span>
                             <div>
-                                <h4 class="font-bold text-blue-800">البروتينات (Protéines)</h4>
-                                <p class="text-sm text-gray-600">جزيئات بنائية وإنزيمية تنظم العمليات الحيوية.</p>
+                                <h4 class="font-bold text-blue-800 dark:text-blue-400">البروتينات (Protéines)</h4>
+                                <p class="text-sm text-gray-600 dark:text-slate-400">جزيئات بنائية وإنزيمية تنظم العمليات الحيوية.</p>
                             </div>
                         </li>
                     </ul>
                 </div>
                 <div class="glass-card p-6 rounded-3xl shadow-xl">
-                    <h3 class="text-center font-bold mb-4">توزيع العناصر الكيميائية (Éléments chimiques)</h3>
+                    <h3 class="text-center font-bold mb-4 dark:text-white">توزيع العناصر الكيميائية (Éléments chimiques)</h3>
                     <canvas id="elementsChart" height="250"></canvas>
                 </div>
             </div>
@@ -99,80 +121,81 @@
 
         <!-- Sugars Tab -->
         <section id="sugars" class="tab-content">
-            <h2 class="text-3xl font-bold mb-8 text-blue-900 border-r-4 border-blue-600 pr-4">السكريات (Glucides)</h2>
+            <h2 class="text-3xl font-bold mb-8 text-blue-900 dark:text-blue-400 border-r-4 border-blue-600 pr-4">السكريات (Glucides)</h2>
             <div class="grid md:grid-cols-3 gap-6 mb-12">
-                <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100">
-                    <h3 class="font-bold text-xl mb-3 text-blue-800">السكريات الأحادية (Oses)</h3>
+                <div class="bg-blue-50 dark:bg-slate-800 p-6 rounded-2xl border border-blue-100 dark:border-slate-700">
+                    <h3 class="font-bold text-xl mb-3 text-blue-800 dark:text-blue-400">السكريات الأحادية (Oses)</h3>
                     <p class="text-sm leading-relaxed">هي أبسط أنواع السكريات، مثل الغليكوز (Glucose) والفركتوز (Fructose). صيغتها الكيميائية العامة هي C<sub>n</sub>(H<sub>2</sub>O)<sub>n</sub>.</p>
                 </div>
-                <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100">
-                    <h3 class="font-bold text-xl mb-3 text-blue-800">السكريات الثنائية (Diholosides)</h3>
+                <div class="bg-blue-50 dark:bg-slate-800 p-6 rounded-2xl border border-blue-100 dark:border-slate-700">
+                    <h3 class="font-bold text-xl mb-3 text-blue-800 dark:text-blue-400">السكريات الثنائية (Diholosides)</h3>
                     <p class="text-sm leading-relaxed">تنتج عن اتحاد جزيئتين من السكريات الأحادية، مثل السكروز (Saccharose) واللاكتوز (Lactose).</p>
                 </div>
-                <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100">
-                    <h3 class="font-bold text-xl mb-3 text-blue-800">السكريات المعقدة (Polyosides)</h3>
+                <div class="bg-blue-50 dark:bg-slate-800 p-6 rounded-2xl border border-blue-100 dark:border-slate-700">
+                    <h3 class="font-bold text-xl mb-3 text-blue-800 dark:text-blue-400">السكريات المعقدة (Polyosides)</h3>
                     <p class="text-sm leading-relaxed">بوليمرات ضخمة تتكون من مئات الجزيئات الأحادية، مثل النشا (Amidon) والغليكوجين (Glycogène).</p>
                 </div>
             </div>
             
-            <div class="bg-white p-8 rounded-3xl shadow-lg mb-12">
-                <h3 class="text-2xl font-bold mb-6 text-blue-800">الكشف عن السكريات (Mise en évidence)</h3>
+            <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg mb-12">
+                <h3 class="text-2xl font-bold mb-6 text-blue-800 dark:text-blue-400">الكشف عن السكريات (Mise en évidence)</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-right border-collapse">
                         <thead>
-                            <tr class="bg-blue-900 text-white">
+                            <tr class="bg-blue-900 dark:bg-blue-800 text-white">
                                 <th class="p-4 rounded-tr-xl">نوع السكر</th>
                                 <th class="p-4">الكاشف المستعمل (Réactif)</th>
                                 <th class="p-4 rounded-tl-xl">النتيجة الإيجابية</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100">
+                        <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
                             <tr>
                                 <td class="p-4 font-bold">النشا (Amidon)</td>
                                 <td class="p-4 italic">الماء اليودي (Eau iodée)</td>
-                                <td class="p-4 text-blue-700 font-medium">لون أزرق بنفسجي داكن</td>
+                                <td class="p-4 text-blue-700 dark:text-blue-400 font-medium">لون أزرق بنفسجي داكن</td>
                             </tr>
                             <tr>
                                 <td class="p-4 font-bold">السكريات المختزلة (Sucres réducteurs)</td>
                                 <td class="p-4 italic">محلول فهلينغ مع التسخين (Liqueur de Fehling)</td>
-                                <td class="p-4 text-red-600 font-medium">راسب أحمر آجوري</td>
+                                <td class="p-4 text-red-600 dark:text-red-400 font-medium">راسب أحمر آجوري</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </section>
+
         <!-- Lipids Tab -->
         <section id="lipids" class="tab-content">
-            <h2 class="text-3xl font-bold mb-8 text-blue-900 border-r-4 border-blue-600 pr-4">الدهنيات (Lipides)</h2>
+            <h2 class="text-3xl font-bold mb-8 text-blue-900 dark:text-blue-400 border-r-4 border-blue-600 pr-4">الدهنيات (Lipides)</h2>
             <div class="grid md:grid-cols-2 gap-8 mb-12">
                 <div class="space-y-6">
                     <p class="text-lg leading-relaxed">
                         الدهنيات هي جزيئات عضوية كارهة للماء (Hydrophobes)، تتكون أساساً من الكربون، الهيدروجين، والأكسجين. تتميز بنسبة منخفضة من الأكسجين مقارنة بالسكريات.
                     </p>
-                    <div class="bg-yellow-50 p-6 rounded-2xl border border-yellow-100">
-                        <h4 class="font-bold text-yellow-800 mb-2">الأحماض الدهنية (Acides gras)</h4>
+                    <div class="bg-yellow-50 dark:bg-slate-800 p-6 rounded-2xl border border-yellow-100 dark:border-slate-700">
+                        <h4 class="font-bold text-yellow-800 dark:text-yellow-500 mb-2">الأحماض الدهنية (Acides gras)</h4>
                         <p class="text-sm">هي الوحدات الأساسية لبناء الدهنيات. قد تكون مشبعة (Saturés) أو غير مشبعة (Insaturés).</p>
                     </div>
-                    <div class="bg-yellow-50 p-6 rounded-2xl border border-yellow-100">
-                        <h4 class="font-bold text-yellow-800 mb-2">الدهون الثلاثية (Triglycérides)</h4>
+                    <div class="bg-yellow-50 dark:bg-slate-800 p-6 rounded-2xl border border-yellow-100 dark:border-slate-700">
+                        <h4 class="font-bold text-yellow-800 dark:text-yellow-500 mb-2">الدهون الثلاثية (Triglycérides)</h4>
                         <p class="text-sm">تتكون من اتحاد الغليسيرول (Glycérol) مع ثلاثة أحماض دهنية، وهي شكل تخزين الطاقة في الجسم.</p>
                     </div>
                 </div>
                 <div class="glass-card p-6 rounded-3xl shadow-xl flex flex-col justify-center">
-                    <h3 class="text-center font-bold mb-6 text-yellow-800">أصناف الدهنيات ووظائفها</h3>
+                    <h3 class="text-center font-bold mb-6 text-yellow-800 dark:text-yellow-500">أصناف الدهنيات ووظائفها</h3>
                     <div class="space-y-4">
-                        <div class="flex justify-between items-center p-3 bg-white rounded-lg">
+                        <div class="flex justify-between items-center p-3 bg-white dark:bg-slate-700 rounded-lg shadow-sm">
                             <span>الفوسفودهنيات (Phospholipides)</span>
-                            <span class="text-xs bg-yellow-200 px-2 py-1 rounded">بناء الأغشية</span>
+                            <span class="text-xs bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-200 px-2 py-1 rounded">بناء الأغشية</span>
                         </div>
-                        <div class="flex justify-between items-center p-3 bg-white rounded-lg">
+                        <div class="flex justify-between items-center p-3 bg-white dark:bg-slate-700 rounded-lg shadow-sm">
                             <span>الستيرويدات (Stéroïdes)</span>
-                            <span class="text-xs bg-yellow-200 px-2 py-1 rounded">هرمونات تنظيمية</span>
+                            <span class="text-xs bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-200 px-2 py-1 rounded">هرمونات تنظيمية</span>
                         </div>
-                        <div class="flex justify-between items-center p-3 bg-white rounded-lg">
+                        <div class="flex justify-between items-center p-3 bg-white dark:bg-slate-700 rounded-lg shadow-sm">
                             <span>الشموع (Cires)</span>
-                            <span class="text-xs bg-yellow-200 px-2 py-1 rounded">حماية وعزل</span>
+                            <span class="text-xs bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-200 px-2 py-1 rounded">حماية وعزل</span>
                         </div>
                     </div>
                 </div>
@@ -181,97 +204,98 @@
 
         <!-- Proteins Tab -->
         <section id="proteins" class="tab-content">
-            <h2 class="text-3xl font-bold mb-8 text-blue-900 border-r-4 border-blue-600 pr-4">البروتينات (Protéines)</h2>
+            <h2 class="text-3xl font-bold mb-8 text-blue-900 dark:text-blue-400 border-r-4 border-blue-600 pr-4">البروتينات (Protéines)</h2>
             <p class="text-lg leading-relaxed mb-8">
                 البروتينات هي بوليمرات تتكون من تسلسل أحماض أمينية (Acides aminés) مرتبطة ببعضها بواسطة روابط ببتيدية (Liaisons peptidiques).
             </p>
             
             <div class="grid md:grid-cols-4 gap-4 mb-12">
-                <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 text-center">
+                <div class="bg-indigo-50 dark:bg-slate-800 p-4 rounded-xl border border-indigo-100 dark:border-slate-700 text-center">
                     <span class="block text-2xl mb-2">1️⃣</span>
-                    <h4 class="font-bold text-indigo-800">بنية أولية (Primaire)</h4>
+                    <h4 class="font-bold text-indigo-800 dark:text-indigo-400">بنية أولية (Primaire)</h4>
                     <p class="text-xs">تسلسل خطي للأحماض الأمينية.</p>
                 </div>
-                <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 text-center">
+                <div class="bg-indigo-50 dark:bg-slate-800 p-4 rounded-xl border border-indigo-100 dark:border-slate-700 text-center">
                     <span class="block text-2xl mb-2">2️⃣</span>
-                    <h4 class="font-bold text-indigo-800">بنية ثانوية (Secondaire)</h4>
+                    <h4 class="font-bold text-indigo-800 dark:text-indigo-400">بنية ثانوية (Secondaire)</h4>
                     <p class="text-xs">التفاف حلزوني أو وريقات مطوية.</p>
                 </div>
-                <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 text-center">
+                <div class="bg-indigo-50 dark:bg-slate-800 p-4 rounded-xl border border-indigo-100 dark:border-slate-700 text-center">
                     <span class="block text-2xl mb-2">3️⃣</span>
-                    <h4 class="font-bold text-indigo-800">بنية ثالثية (Tertiaire)</h4>
+                    <h4 class="font-bold text-indigo-800 dark:text-indigo-400">بنية ثالثية (Tertiaire)</h4>
                     <p class="text-xs">شكل ثلاثي الأبعاد وظيفي.</p>
                 </div>
-                <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 text-center">
+                <div class="bg-indigo-50 dark:bg-slate-800 p-4 rounded-xl border border-indigo-100 dark:border-slate-700 text-center">
                     <span class="block text-2xl mb-2">4️⃣</span>
-                    <h4 class="font-bold text-indigo-800">بنية رابعية (Quaternaire)</h4>
+                    <h4 class="font-bold text-indigo-800 dark:text-indigo-400">بنية رابعية (Quaternaire)</h4>
                     <p class="text-xs">تجمع عدة وحدات بروتينية.</p>
                 </div>
             </div>
 
-            <div class="bg-white p-8 rounded-3xl shadow-lg">
-                <h3 class="text-2xl font-bold mb-6 text-indigo-800 text-center">الوظائف الحيوية للبروتينات</h3>
+            <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg">
+                <h3 class="text-2xl font-bold mb-6 text-indigo-800 dark:text-indigo-400 text-center">الوظائف الحيوية للبروتينات</h3>
                 <canvas id="proteinFuncChart" height="150"></canvas>
             </div>
         </section>
 
         <!-- Comparison Tab -->
         <section id="comparison" class="tab-content">
-            <h2 class="text-3xl font-bold mb-8 text-blue-900 border-r-4 border-blue-600 pr-4">مقارنة شاملة (Comparaison globale)</h2>
+            <h2 class="text-3xl font-bold mb-8 text-blue-900 dark:text-blue-400 border-r-4 border-blue-600 pr-4">مقارنة شاملة (Comparaison globale)</h2>
             <div class="overflow-x-auto shadow-2xl rounded-3xl">
-                <table class="w-full text-right border-collapse bg-white">
+                <table class="w-full text-right border-collapse bg-white dark:bg-slate-800">
                     <thead>
-                        <tr class="bg-gray-800 text-white">
+                        <tr class="bg-gray-800 dark:bg-slate-900 text-white">
                             <th class="p-6">الخاصية</th>
                             <th class="p-6">السكريات (Glucides)</th>
                             <th class="p-6">الدهنيات (Lipides)</th>
                             <th class="p-6">البروتينات (Protéines)</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
                         <tr>
-                            <td class="p-6 font-bold bg-gray-50">العناصر الكيميائية</td>
-                            <td class="p-6 italic text-blue-700">C, H, O</td>
-                            <td class="p-6 italic text-yellow-700">C, H, O (O قليل)</td>
-                            <td class="p-6 italic text-indigo-700">C, H, O, N, S</td>
+                            <td class="p-6 font-bold bg-gray-50 dark:bg-slate-900">العناصر الكيميائية</td>
+                            <td class="p-6 italic text-blue-700 dark:text-blue-400">C, H, O</td>
+                            <td class="p-6 italic text-yellow-700 dark:text-yellow-500">C, H, O (O قليل)</td>
+                            <td class="p-6 italic text-indigo-700 dark:text-indigo-400">C, H, O, N, S</td>
                         </tr>
                         <tr>
-                            <td class="p-6 font-bold bg-gray-50">الوحدة الأساسية</td>
+                            <td class="p-6 font-bold bg-gray-50 dark:bg-slate-900">الوحدة الأساسية</td>
                             <td class="p-6">سكر أحادي (Ose)</td>
                             <td class="p-6">حمض دهني (Acide gras)</td>
                             <td class="p-6">حمض أميني (Acide aminé)</td>
                         </tr>
                         <tr>
-                            <td class="p-6 font-bold bg-gray-50">الدور الأساسي</td>
+                            <td class="p-6 font-bold bg-gray-50 dark:bg-slate-900">الدور الأساسي</td>
                             <td class="p-6">طاقة سريعة</td>
                             <td class="p-6">طاقة احتياطية وبناء</td>
                             <td class="p-6">بناء وتنظيم (إنزيمات)</td>
                         </tr>
                         <tr>
-                            <td class="p-6 font-bold bg-gray-50">كمية الطاقة (Kj/g)</td>
+                            <td class="p-6 font-bold bg-gray-50 dark:bg-slate-900">كمية الطاقة (Kj/g)</td>
                             <td class="p-6 font-mono">17</td>
-                            <td class="p-6 font-mono text-red-600 font-bold">38</td>
+                            <td class="p-6 font-mono text-red-600 dark:text-red-400 font-bold">38</td>
                             <td class="p-6 font-mono">17</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </section>
+
         <!-- Quiz Tab -->
         <section id="quiz" class="tab-content">
-            <div class="max-w-2xl mx-auto bg-white p-8 rounded-3xl shadow-xl border border-blue-100">
-                <h2 class="text-3xl font-bold mb-6 text-center text-blue-900">اختبار المعارف 🧪</h2>
+            <div class="max-w-2xl mx-auto bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-xl border border-blue-100 dark:border-slate-700">
+                <h2 class="text-3xl font-bold mb-6 text-center text-blue-900 dark:text-blue-400">اختبار المعارف 🧪</h2>
                 <div id="quiz-container">
                     <div id="question-box" class="mb-8">
-                        <p id="question-text" class="text-xl font-bold mb-6 leading-relaxed text-gray-700"></p>
+                        <p id="question-text" class="text-xl font-bold mb-6 leading-relaxed text-gray-700 dark:text-slate-200"></p>
                         <div id="options-container" class="grid gap-4"></div>
                     </div>
                     <div id="quiz-feedback" class="hidden p-4 rounded-xl mb-6 text-center font-bold"></div>
                     <button id="nextBtn" onclick="nextQuestion()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 transition-all hidden">السؤال التالي ←</button>
                     <div id="result-box" class="hidden text-center">
-                        <h3 class="text-2xl font-bold mb-4">انتهى الاختبار!</h3>
-                        <p id="score-text" class="text-4xl font-black text-blue-600 mb-6"></p>
-                        <button onclick="resetQuiz()" class="bg-gray-800 text-white px-8 py-3 rounded-xl font-bold">إعادة المحاولة</button>
+                        <h3 class="text-2xl font-bold mb-4 dark:text-white">انتهى الاختبار!</h3>
+                        <p id="score-text" class="text-4xl font-black text-blue-600 dark:text-blue-400 mb-6"></p>
+                        <button onclick="resetQuiz()" class="bg-gray-800 dark:bg-blue-600 text-white px-8 py-3 rounded-xl font-bold">إعادة المحاولة</button>
                     </div>
                 </div>
             </div>
@@ -291,6 +315,31 @@
     </footer>
 
     <script>
+        // Dark Mode Toggle
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const isDark = html.classList.contains('dark');
+            if (isDark) {
+                html.classList.remove('dark');
+                document.getElementById('theme-icon-light').classList.remove('hidden');
+                document.getElementById('theme-icon-dark').classList.add('hidden');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                document.getElementById('theme-icon-light').classList.add('hidden');
+                document.getElementById('theme-icon-dark').classList.remove('hidden');
+                localStorage.setItem('theme', 'dark');
+            }
+            updateChartColors(!isDark);
+        }
+
+        // Initialize Theme
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            document.getElementById('theme-icon-light').classList.add('hidden');
+            document.getElementById('theme-icon-dark').classList.remove('hidden');
+        }
+
         // Tab System
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -300,35 +349,71 @@
             window.scrollTo(0, 0);
         }
 
-        // Charts Initialization
+        let elementsChart, proteinFuncChart;
+
+        function updateChartColors(isDark) {
+            const textColor = isDark ? '#f1f5f9' : '#1e293b';
+            const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+            
+            if (elementsChart) {
+                elementsChart.options.plugins.legend.labels.color = textColor;
+                elementsChart.update();
+            }
+            if (proteinFuncChart) {
+                proteinFuncChart.options.scales.x.ticks.color = textColor;
+                proteinFuncChart.options.scales.y.ticks.color = textColor;
+                proteinFuncChart.options.scales.x.grid.color = gridColor;
+                proteinFuncChart.options.scales.y.grid.color = gridColor;
+                proteinFuncChart.update();
+            }
+        }
+
         window.onload = function() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#f1f5f9' : '#1e293b';
+
             const ctx1 = document.getElementById('elementsChart').getContext('2d');
-            new Chart(ctx1, {
+            elementsChart = new Chart(ctx1, {
                 type: 'polarArea',
                 data: {
                     labels: ['كربون (C)', 'هيدروجين (H)', 'أكسجين (O)', 'نيتروجين (N)', 'كبريت (S)'],
                     datasets: [{
                         data: [45, 30, 15, 7, 3],
-                        backgroundColor: ['#1e3a8a', '#3b82f6', '#fbbf24', '#ef4444', '#10b981']
+                        backgroundColor: ['#1e3a8a', '#3b82f6', '#fbbf24', '#ef4444', '#10b981'],
+                        borderWidth: 0
                     }]
                 },
-                options: { plugins: { legend: { position: 'bottom', labels: { font: { family: 'Tajawal' } } } } }
+                options: { 
+                    plugins: { 
+                        legend: { 
+                            position: 'bottom', 
+                            labels: { color: textColor, font: { family: 'Tajawal' } } 
+                        } 
+                    },
+                    scales: {
+                        r: { grid: { color: 'rgba(150,150,150,0.2)' }, ticks: { display: false } }
+                    }
+                }
             });
 
             const ctx2 = document.getElementById('proteinFuncChart').getContext('2d');
-            new Chart(ctx2, {
+            proteinFuncChart = new Chart(ctx2, {
                 type: 'bar',
                 data: {
                     labels: ['بناء الأنسجة', 'إنزيمات (تسريع التفاعلات)', 'هرمونات', 'مناعة (أجسام مضادة)', 'نقل الأكسجين'],
                     datasets: [{
                         label: 'أهمية الوظيفة (%)',
                         data: [90, 95, 80, 85, 75],
-                        backgroundColor: '#4f46e5'
+                        backgroundColor: '#4f46e5',
+                        borderRadius: 8
                     }]
                 },
                 options: { 
                     indexAxis: 'y',
-                    scales: { x: { beginAtZero: true, max: 100 } },
+                    scales: { 
+                        x: { beginAtZero: true, max: 100, ticks: { color: textColor }, grid: { display: false } },
+                        y: { ticks: { color: textColor }, grid: { display: false } }
+                    },
                     plugins: { legend: { display: false } }
                 }
             });
@@ -354,7 +439,7 @@
             container.innerHTML = '';
             q.a.forEach((opt, i) => {
                 const btn = document.createElement('button');
-                btn.className = "p-4 text-right border-2 border-gray-100 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all font-medium";
+                btn.className = "p-4 text-right border-2 border-gray-100 dark:border-slate-700 rounded-xl hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-slate-700 transition-all font-medium";
                 btn.innerText = opt;
                 btn.onclick = () => checkAnswer(i);
                 container.appendChild(btn);
@@ -370,10 +455,10 @@
             if(idx === q.c) {
                 score++;
                 feedback.innerText = "إجابة صحيحة! أحسنت.";
-                feedback.className = "p-4 rounded-xl mb-6 text-center font-bold bg-green-100 text-green-700";
+                feedback.className = "p-4 rounded-xl mb-6 text-center font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
             } else {
                 feedback.innerText = "إجابة خاطئة. الإجابة الصحيحة هي: " + q.a[q.c];
-                feedback.className = "p-4 rounded-xl mb-6 text-center font-bold bg-red-100 text-red-700";
+                feedback.className = "p-4 rounded-xl mb-6 text-center font-bold bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
             }
             document.getElementById('nextBtn').classList.remove('hidden');
             document.querySelectorAll('#options-container button').forEach(b => b.disabled = true);
